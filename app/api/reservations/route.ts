@@ -10,19 +10,55 @@ if (!existsSync(dataDir)) {
   mkdirSync(dataDir, { recursive: true });
 }
 
-export async function GET() {
+function readReservations() {
   try {
-    if (!existsSync(reservationsFile)) {
-      return NextResponse.json([]);
-    }
-    const data = readFileSync(reservationsFile, "utf8");
-    return NextResponse.json(JSON.parse(data));
-  } catch (e) {
-    return NextResponse.json([]);
+    if (!existsSync(reservationsFile)) return [];
+    return JSON.parse(readFileSync(reservationsFile, "utf8"));
+  } catch {
+    return [];
   }
 }
 
-export async function POST(request: Request) {
+function writeReservations(reservations: any[]) {
+  writeFileSync(reservationsFile, JSON.stringify(reservations, null, 2));
+}
+
+export async function GET(request: Request) {
+    try {
+      const reservations = readReservations();
+      return NextResponse.json(reservations);
+    } catch {
+      return NextResponse.json([]);
+    }
+  }
+
+  export async function DELETE(request: Request) {
+    try {
+      const { searchParams } = new URL(request.url);
+      const id = searchParams.get("id");
+
+      if (!id) {
+        return NextResponse.json({ error: "Reservation ID required" }, { status: 400 });
+      }
+
+      const reservations = readReservations();
+      const index = reservations.findIndex((r: any) => r.id === id);
+
+      if (index === -1) {
+        return NextResponse.json({ error: "Reservation not found" }, { status: 404 });
+      }
+
+      reservations[index].status = "cancelled";
+      reservations[index].cancelledAt = new Date().toISOString();
+      writeReservations(reservations);
+
+      return NextResponse.json({ success: true, reservation: reservations[index] });
+    } catch {
+      return NextResponse.json({ error: "Server error" }, { status: 500 });
+    }
+  }
+
+  export async function POST(request: Request) {
   try {
     const body = await request.json();
     if (body.action === "sync") {
@@ -42,3 +78,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false }, { status: 500 });
   }
 }
+
+

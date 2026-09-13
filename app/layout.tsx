@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
 import { CartProvider } from "./cart-context";
+import { CustomerProvider } from "./customer-context";
 import { ToastProvider } from "./toast-context";
 import { WishlistProvider } from "./wishlist-context";
 import { RecentlyViewedProvider } from "./recently-viewed-context";
@@ -45,8 +46,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${jakarta.variable} font-jakarta antialiased`}>
-        <ThemeProvider>
-        <CartProvider>
+        <ThemeProvider>\n        <CustomerProvider>\n        <CartProvider>
           <ToastProvider>
             <WishlistProvider>
               <RecentlyViewedProvider>
@@ -78,9 +78,11 @@ export default function RootLayout({
               </RecentlyViewedProvider>
             </WishlistProvider>
           </ToastProvider>
-        </CartProvider>
-        </ThemeProvider>
+        </CartProvider>\n        </CustomerProvider>\n      </ThemeProvider>
       </body>
     </html>
   );
 }
+
+
+
