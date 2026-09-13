@@ -3,7 +3,7 @@
 import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Settings, Menu as MenuIcon, Package, Calendar, Users as UsersIcon, MessageSquare, FileText, Package as PackageIcon, Tag, UserSquare } from "lucide-react";
+import { Home, Settings, Menu as MenuIcon, Package, Calendar, Users as UsersIcon, MessageSquare, FileText, Package as PackageIcon, Tag, UserSquare, QrCode, Trophy, MapPin } from "lucide-react";
 import { InventoryProvider } from "@/app/inventory-context";
 import { StaffProvider } from "@/app/staff-context";
 import { AuthProvider } from "@/app/auth-context";

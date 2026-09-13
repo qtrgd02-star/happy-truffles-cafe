@@ -339,8 +339,39 @@ const translations: Record<Language, Record<string, string>> = {
     nameDescending: "Name: Z to A",
     relevance: "Relevance",
     defaultSort: "Default",
+
   },
   ar: {
+    trackOrder: "تتبع الطلب",
+    orderStatus: "حالة الطلب",
+    orderReceived: "تم استلام الطلب",
+    confirmed: "تم التأكيد",
+    preparing: "جاري التحضير",
+    ready: "جاهز",
+    outForDelivery: "خارج للتوصيل",
+    delivered: "تم التوصيل",
+    scanToOrder: "امسح للطلب",
+    addTable: "إضافة طاولة",
+    tableNumber: "رقم الطاولة",
+    seats: "مقاعد",
+    label: "التسمية",
+    printQR: "طباعة QR",
+    downloadQRCode: "تنزيل رمز QR",
+    points: "نقاط",
+    pointsWorth: "قيمة النقاط",
+    totalOrders: "إجمالي الطلبات",
+    totalSpent: "إجمالي الإنفاق",
+    earnPoints: "اكسب نقطة واحدة مقابل كل ريال قطري تنفقه",
+    redeemPoints: "استبدال النقاط",
+    lowStock: "مخزون منخفض",
+    outOfStock: "نفد المخزون",
+    stockRemaining: "متبقي في المخزون",
+    inventoryAlert: "تنبيه المخزون",
+    orderViaWhatsApp: "اطلب عبر واتساب",
+    whatsappOrder: "طلب واتساب",
+    loyalty: "نقاط الولاء",
+    tracking: "تتبع",
+    tablesQR: "رموز QR للطاولات",
   },
 };
 
@@ -378,3 +409,4 @@ export function useLanguage() {
   if (!context) throw new Error("useLanguage must be used within LanguageProvider");
   return context;
 }
+

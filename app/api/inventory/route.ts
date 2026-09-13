@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { checkInventoryAlerts, sendInventoryAlertNotifications } from "@/app/lib/inventory-alerts";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import path from "path";
 import { db } from "@/app/lib/firebase/config";

@@ -8,7 +8,7 @@ import { useLoyalty } from "@/app/loyalty-context";
 import { useGiftCards } from "@/app/gift-card-context";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShoppingCart, CheckCircle, X, User, Mail, Phone, MapPin, MessageSquare, Ticket } from "lucide-react";
+import { ShoppingCart, CheckCircle, X, User, Mail, Phone, MapPin, MessageSquare, Ticket, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -99,7 +99,7 @@ export default function CheckoutPage() {
     if (giftCardDeduction > 0) order.giftCardDeduction = giftCardDeduction;
     const created = addOrder(order);
     const earnedPoints = Math.floor(finalTotal);
-    addPoints(earnedPoints);
+    addPoints(form.phone, finalTotal);
     setOrderId(created.id);
 
     for (const item of cart) {
@@ -374,3 +374,4 @@ export default function CheckoutPage() {
     </div>
   );
 }
+

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/app/cart-context";
 import { usePromos } from "@/app/promo-context";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Trash2, ShoppingCart, ArrowRight, Tag } from "lucide-react";
+import { X, Trash2, ShoppingCart, ArrowRight, Tag, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -26,6 +26,17 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
     if (result.success) {
       setPromoInput("");
     }
+  };
+
+  const handleWhatsAppOrder = () => {
+    const orderText = cart.map(item => {
+      const note = item.notes ? " (Note: " + item.notes + ")" : "";
+      return item.title + " x" + item.quantity + " - QAR " + (item.price * item.quantity).toFixed(2) + note;
+    }).join("\n");
+
+    const promoText = appliedPromo ? "\nPromo: " + appliedPromo.code : "";
+    const message = "New Order from Happy Truffles Cafe Website:\n\n" + orderText + "\n\nSubtotal: QAR " + cartTotal.toFixed(2) + promoText + "\nTotal: QAR " + finalTotal.toFixed(2);
+    window.open("https://wa.me/97431590002?text=" + encodeURIComponent(message), "_blank");
   };
 
   return (

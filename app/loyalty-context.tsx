@@ -1,51 +1,99 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+
+export interface LoyaltyAccount {
+  phone: string;
+  name: string;
+  points: number;
+  totalOrders: number;
+  totalSpent: number;
+  createdAt: string;
+}
 
 interface LoyaltyContextType {
-  points: number;
-  addPoints: (points: number) => void;
-  redeemPoints: (points: number) => boolean;
-  clearLoyalty: () => void;
+  accounts: LoyaltyAccount[];
+  addPoints: (phone: string, orderTotal: number) => void;
+  redeemPoints: (phone: string, pointsToRedeem: number) => { success: boolean; remainingPoints: number };
+  getAccount: (phone: string) => LoyaltyAccount | undefined;
+  getPointsValue: (points: number) => number;
 }
 
 const LoyaltyContext = createContext<LoyaltyContextType | undefined>(undefined);
 
 export function LoyaltyProvider({ children }: { children: ReactNode }) {
-  const [points, setPoints] = useState(0);
+  const [accounts, setAccounts] = useState<LoyaltyAccount[]>([]);
 
-  useEffect(() => {
-    const saved = localStorage.getItem("loyaltyPoints");
-    if (saved) {
-      try {
-        setPoints(Number(saved));
-      } catch (e) {
-        console.error("Failed to parse loyalty points from localStorage", e);
-        localStorage.removeItem("loyaltyPoints");
+  const loadAccounts = useCallback(() => {
+    try {
+      const saved = localStorage.getItem("loyaltyAccounts");
+      if (saved) {
+        setAccounts(JSON.parse(saved));
       }
+    } catch (e) {
+      console.error("Failed to load loyalty accounts:", e);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem("loyaltyPoints", String(points));
-  }, [points]);
+    loadAccounts();
+  }, [loadAccounts]);
 
-  const addPoints = (earned: number) => {
-    setPoints((prev) => prev + earned);
+  const saveAccounts = (newAccounts: LoyaltyAccount[]) => {
+    localStorage.setItem("loyaltyAccounts", JSON.stringify(newAccounts));
+    setAccounts(newAccounts);
   };
 
-  const redeemPoints = (cost: number) => {
-    if (points >= cost) {
-      setPoints((prev) => prev - cost);
-      return true;
+  const addPoints = (phone: string, orderTotal: number) => {
+    const pointsEarned = Math.floor(orderTotal);
+    const newAccounts = [...accounts];
+    const index = newAccounts.findIndex((a) => a.phone === phone);
+
+    if (index === -1) {
+      newAccounts.push({
+        phone,
+        name: "",
+        points: pointsEarned,
+        totalOrders: 1,
+        totalSpent: orderTotal,
+        createdAt: new Date().toISOString(),
+      });
+    } else {
+      newAccounts[index] = {
+        ...newAccounts[index],
+        points: newAccounts[index].points + pointsEarned,
+        totalOrders: newAccounts[index].totalOrders + 1,
+        totalSpent: newAccounts[index].totalSpent + orderTotal,
+      };
     }
-    return false;
+
+    saveAccounts(newAccounts);
   };
 
-  const clearLoyalty = () => setPoints(0);
+  const redeemPoints = (phone: string, pointsToRedeem: number) => {
+    const account = accounts.find((a) => a.phone === phone);
+    if (!account || account.points < pointsToRedeem) {
+      return { success: false, remainingPoints: account?.points || 0 };
+    }
+
+    const newAccounts = accounts.map((a) =>
+      a.phone === phone ? { ...a, points: a.points - pointsToRedeem } : a
+    );
+
+    saveAccounts(newAccounts);
+    return { success: true, remainingPoints: account.points - pointsToRedeem };
+  };
+
+  const getAccount = (phone: string) => {
+    return accounts.find((a) => a.phone === phone);
+  };
+
+  const getPointsValue = (points: number) => {
+    return points * 0.1; // 1 point = 0.1 QAR
+  };
 
   return (
-    <LoyaltyContext.Provider value={{ points, addPoints, redeemPoints, clearLoyalty }}>
+    <LoyaltyContext.Provider value={{ accounts, addPoints, redeemPoints, getAccount, getPointsValue }}>
       {children}
     </LoyaltyContext.Provider>
   );
@@ -53,6 +101,8 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
 
 export function useLoyalty() {
   const context = useContext(LoyaltyContext);
-  if (!context) throw new Error("useLoyalty must be used within LoyaltyProvider");
+  if (!context) {
+    throw new Error("useLoyalty must be used within LoyaltyProvider");
+  }
   return context;
 }

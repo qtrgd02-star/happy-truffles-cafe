@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useOrderHistory, type OrderStatus } from "@/app/order-history-context";
 import { useCart } from "@/app/cart-context";
 import { useToast } from "@/app/toast-context";
-import { useLoyalty } from "@/app/loyalty-context";
 import { motion } from "framer-motion";
 import { Package, Trash2, ChevronRight, ShoppingBag, RefreshCw, Star, XCircle } from "lucide-react";
 import Link from "next/link";
@@ -14,8 +13,7 @@ export default function OrdersPage() {
   const { orders, updateOrderStatus, clearHistory } = useOrderHistory();
   const { addToCart } = useCart();
   const { showToast } = useToast();
-  const { points } = useLoyalty();
-  const [reorderMessage, setReorderMessage] = useState<string | null>(null);
+    const [reorderMessage, setReorderMessage] = useState<string | null>(null);
 
   const handleReorder = (order: typeof orders[0]) => {
     order.items.forEach((item) => {
@@ -46,11 +44,7 @@ export default function OrdersPage() {
             <Package size={64} className="text-chocolate/20 mx-auto mb-4" />
             <h2 className="font-playfair text-2xl font-bold text-chocolate mb-2">No orders yet</h2>
             <p className="text-chocolate/60 mb-6">Your order history will appear here after your first purchase.</p>
-            <div className="flex items-center justify-center gap-2 mb-6 text-truffle">
-              <Star size={20} />
-              <span className="font-bold text-lg">{points} Loyalty Points</span>
-            </div>
-            <Link
+                        <Link
               href="/#menu"
               className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors"
             >
@@ -68,11 +62,7 @@ export default function OrdersPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="font-playfair text-4xl font-bold text-chocolate">Order History</h1>
-            <div className="flex items-center gap-2 mt-2 text-truffle">
-              <Star size={20} />
-              <span className="font-bold">{points} Loyalty Points</span>
-            </div>
-          </div>
+                      </div>
           <div className="flex items-center gap-2">
             <button
               onClick={() => {
