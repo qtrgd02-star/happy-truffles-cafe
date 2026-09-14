@@ -5,6 +5,7 @@ export interface Review {
   rating: number;
   status: "pending" | "approved" | "rejected";
   createdAt: string;
+  photo?: string;
 }
 
 export const testimonials: Review[] = [

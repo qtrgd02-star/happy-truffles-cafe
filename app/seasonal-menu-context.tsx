@@ -6,9 +6,10 @@ export interface SeasonalItem {
   title: string;
   price: number;
   image: string;
-  season: "spring" | "summer" | "autumn" | "winter" | "all";
+  season: "spring" | "summer" | "autumn" | "winter" | "ramadan" | "eid" | "all";
   description: string;
   available: boolean;
+  countdownTo?: string;
 }
 
 interface SeasonalMenuContextType {
@@ -17,6 +18,7 @@ interface SeasonalMenuContextType {
   setCurrentSeason: (season: string) => void;
   toggleAvailability: (id: number) => void;
   getItemsBySeason: (season: string) => SeasonalItem[];
+  getCountdown: (itemId: number) => { days: number; hours: number; minutes: number; seconds: number } | null;
 }
 
 const SeasonalMenuContext = createContext<SeasonalMenuContextType | undefined>(undefined);
@@ -46,8 +48,21 @@ export function SeasonalMenuProvider({ children }: { children: ReactNode }) {
 
   const getItemsBySeason = (season: string) => seasonalItems.filter((item) => item.season === season || item.season === "all");
 
+  const getCountdown = (itemId: number) => {
+    const item = seasonalItems.find((i) => i.id === itemId);
+    if (!item?.countdownTo) return null;
+    const target = new Date(item.countdownTo).getTime();
+    const now = Date.now();
+    const diff = Math.max(0, target - now);
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+    return { days, hours, minutes, seconds };
+  };
+
   return (
-    <SeasonalMenuContext.Provider value={{ seasonalItems, currentSeason, setCurrentSeason, toggleAvailability, getItemsBySeason }}>
+    <SeasonalMenuContext.Provider value={{ seasonalItems, currentSeason, setCurrentSeason, toggleAvailability, getItemsBySeason, getCountdown }}>
       {children}
     </SeasonalMenuContext.Provider>
   );

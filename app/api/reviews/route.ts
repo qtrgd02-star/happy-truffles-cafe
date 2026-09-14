@@ -85,6 +85,7 @@ export async function POST(request: Request) {
         rating: body.rating || 5,
         status: "pending",
         createdAt: body.createdAt || new Date().toISOString(),
+        photo: body.photo,
       };
       reviews.push(newReview);
       writeReviews(reviews);

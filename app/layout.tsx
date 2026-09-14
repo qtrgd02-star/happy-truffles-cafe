@@ -99,6 +99,11 @@ export const metadata: Metadata = {
 };
 
 import { ServiceWorkerRegistrar } from "./components/service-worker-registrar";
+import { SubscriptionProvider } from "./subscription-context";
+import { CustomizationProvider } from "./customization-context";
+import { CorporateProvider } from "./corporate-context";
+import { WhatsAppProvider } from "./whatsapp-context";
+import { BirthdayProvider } from "./birthday-context";
 
 export default function RootLayout({
   children,
@@ -133,10 +138,20 @@ export default function RootLayout({
                                                   <DriverProvider>
                                                     <CateringProvider>
                                                       <SeasonalMenuProvider>
-                                                      <StaffScheduleProvider>
-                                                        <ServiceWorkerRegistrar />
-                                                        {children}
-                                                      </StaffScheduleProvider>
+                                                       <StaffScheduleProvider>
+                                                         <ServiceWorkerRegistrar />
+                                                         <SubscriptionProvider>
+                                                           <CustomizationProvider>
+                                                             <CorporateProvider>
+                                                               <WhatsAppProvider>
+                                                                 <BirthdayProvider>
+                                                                   {children}
+                                                                 </BirthdayProvider>
+                                                               </WhatsAppProvider>
+                                                             </CorporateProvider>
+                                                           </CustomizationProvider>
+                                                         </SubscriptionProvider>
+                                                       </StaffScheduleProvider>
                                                     </SeasonalMenuProvider>
                                                     </CateringProvider>
                                                   </DriverProvider>

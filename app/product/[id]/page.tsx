@@ -5,6 +5,7 @@ import { useCart } from "@/app/cart-context";
 import { useToast } from "@/app/toast-context";
 import { useWishlist } from "@/app/wishlist-context";
 import { useReviews } from "@/app/reviews-context";
+import { useCustomizations } from "@/app/customization-context";
 import { menuItems } from "@/app/menu-data";
 import { testimonials, type Review } from "@/app/reviews-data";
 import Link from "next/link";
@@ -116,6 +117,9 @@ function ReviewCard({ review }: { review: Review }) {
       <p className="text-chocolate/80 text-sm leading-relaxed mt-3 mb-4 italic">
         &ldquo;{review.text}&rdquo;
       </p>
+      {review.photo && (
+        <img src={review.photo} alt="Review photo" className="w-full h-48 object-cover rounded-xl mb-4 border border-chocolate/10" />
+      )}
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 bg-truffle/10 rounded-full flex items-center justify-center">
           <span className="font-playfair font-bold text-truffle text-sm">
@@ -144,6 +148,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     email: "",
     rating: 5,
     comment: "",
+    photo: "",
   });
   const [reviewErrors, setReviewErrors] = useState<{
     name?: string;
@@ -151,6 +156,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     comment?: string;
   }>({});
   const [reviewSubmitted, setReviewSubmitted] = useState(false);
+  const { getCustomizations } = useCustomizations();
+  const [selectedCustomizations, setSelectedCustomizations] = useState<Record<string, string>>({});
+  const itemCustomizations = getCustomizations(id);
 
   const allReviews = useMemo(() => [...testimonials, ...localReviews], [localReviews]);
 
@@ -242,6 +250,17 @@ export default function ProductPage({ params }: { params: { id: string } }) {
     }));
   };
 
+  const handleReviewPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setReviewForm((prev) => ({ ...prev, photo: reader.result as string }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleReviewSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: {
@@ -263,8 +282,9 @@ export default function ProductPage({ params }: { params: { id: string } }) {
       name: reviewForm.name.trim(),
       text: reviewForm.comment.trim(),
       rating: reviewForm.rating,
+      photo: reviewForm.photo || undefined,
     });
-    setReviewForm({ name: "", email: "", rating: 5, comment: "" });
+    setReviewForm({ name: "", email: "", rating: 5, comment: "", photo: "" });
     setReviewSubmitted(true);
     showToast("Review submitted!");
     setTimeout(() => setReviewSubmitted(false), 3000);
@@ -362,6 +382,59 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                 </ul>
               </div>
 
+              {item.nutrition && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-chocolate dark:text-vanilla mb-3 flex items-center gap-2">
+                    <Star size={18} />
+                    Nutrition
+                  </h3>
+                  <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+                    <div className="bg-vanilla/30 rounded-xl p-3 text-center">
+                      <p className="text-xs text-chocolate/60">Calories</p>
+                      <p className="font-bold text-chocolate">{item.nutrition.calories}</p>
+                    </div>
+                    <div className="bg-vanilla/30 rounded-xl p-3 text-center">
+                      <p className="text-xs text-chocolate/60">Protein</p>
+                      <p className="font-bold text-chocolate">{item.nutrition.protein}g</p>
+                    </div>
+                    <div className="bg-vanilla/30 rounded-xl p-3 text-center">
+                      <p className="text-xs text-chocolate/60">Carbs</p>
+                      <p className="font-bold text-chocolate">{item.nutrition.carbs}g</p>
+                    </div>
+                    <div className="bg-vanilla/30 rounded-xl p-3 text-center">
+                      <p className="text-xs text-chocolate/60">Fat</p>
+                      <p className="font-bold text-chocolate">{item.nutrition.fat}g</p>
+                    </div>
+                    <div className="bg-vanilla/30 rounded-xl p-3 text-center">
+                      <p className="text-xs text-chocolate/60">Sugar</p>
+                      <p className="font-bold text-chocolate">{item.nutrition.sugar}g</p>
+                    </div>
+                    <div className="bg-vanilla/30 rounded-xl p-3 text-center">
+                      <p className="text-xs text-chocolate/60">Fiber</p>
+                      <p className="font-bold text-chocolate">{item.nutrition.fiber}g</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-chocolate/50 mt-2">Serving size: {item.nutrition.servingSize}</p>
+                </div>
+              )}
+
+              {item.allergens && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-chocolate dark:text-vanilla mb-3 flex items-center gap-2">
+                    <Star size={18} />
+                    Allergens
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {item.allergens.contains.map((a) => (
+                      <span key={a} className="px-3 py-1 rounded-full bg-red-100 text-red-700 text-xs font-medium">Contains: {a}</span>
+                    ))}
+                    {item.allergens.mayContain.map((a) => (
+                      <span key={a} className="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-medium">May contain: {a}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {sizes.length > 0 && (
                 <div className="mb-6">
                   <h3 className="font-semibold text-chocolate dark:text-vanilla mb-3 flex items-center gap-2">
@@ -384,6 +457,53 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                       >
                         {size.name} — QAR {size.price}
                       </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {itemCustomizations.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="font-semibold text-chocolate dark:text-vanilla mb-3 flex items-center gap-2">
+                    <Tag size={18} />
+                    Customize
+                  </h3>
+                  <div className="space-y-4">
+                    {itemCustomizations.map((option) => (
+                      <div key={option.id}>
+                        <label className="block text-sm font-medium text-chocolate dark:text-vanilla mb-2">
+                          {option.name} {option.required && <span className="text-red-500">*</span>}
+                        </label>
+                        {option.type === "select" && (
+                          <select
+                            value={selectedCustomizations[option.id] || ""}
+                            onChange={(e) => setSelectedCustomizations((prev) => ({ ...prev, [option.id]: e.target.value }))}
+                            className="w-full border border-chocolate/20 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-truffle"
+                          >
+                            <option value="">Select an option</option>
+                            {option.options.map((opt) => (
+                              <option key={opt.label} value={opt.label}>
+                                {opt.label} {opt.price !== 0 && `(+QAR ${opt.price})`}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                        {option.type === "checkbox" && (
+                          <div className="space-y-2">
+                            {option.options.map((opt) => (
+                              <label key={opt.label} className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={selectedCustomizations[option.id] === opt.label}
+                                  onChange={(e) => setSelectedCustomizations((prev) => ({ ...prev, [option.id]: e.target.checked ? opt.label : "" }))}
+                                  className="rounded border-chocolate/20 text-truffle focus:ring-truffle"
+                                />
+                                <span className="text-sm text-chocolate/80">{opt.label} (+QAR {opt.price})</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -417,12 +537,25 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
                 <button
                   onClick={() => {
+                    const customizationTotal = itemCustomizations.reduce((sum, opt) => {
+                      const selected = selectedCustomizations[opt.id];
+                      if (!selected) return sum;
+                      const option = opt.options.find((o) => o.label === selected);
+                      return sum + (option?.price || 0);
+                    }, 0);
                     for (let i = 0; i < quantity; i++) {
                       addToCart({
                         id: item.id,
                         title: item.title,
-                        price: currentPrice,
+                        price: currentPrice + customizationTotal,
                         image: item.image,
+                        customizations: itemCustomizations
+                          .filter((opt) => selectedCustomizations[opt.id])
+                          .map((opt) => ({
+                            name: opt.name,
+                            values: [selectedCustomizations[opt.id]],
+                            priceAdjustment: opt.options.find((o) => o.label === selectedCustomizations[opt.id])?.price || 0,
+                          })),
                       });
                     }
                     showToast("Added to cart");
@@ -620,6 +753,20 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                         </button>
                       ))}
                     </div>
+                  </div>
+                  <div>
+                    <label className="block text-chocolate dark:text-vanilla font-medium mb-2">
+                      Photo (optional)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleReviewPhoto}
+                      className="w-full border border-chocolate/20 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-truffle text-sm"
+                    />
+                    {reviewForm.photo && (
+                      <img src={reviewForm.photo} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded-lg border border-chocolate/20" />
+                    )}
                   </div>
                   <div>
                     <label className="block text-chocolate dark:text-vanilla font-medium mb-2">

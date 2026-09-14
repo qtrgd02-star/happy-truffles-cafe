@@ -9,6 +9,7 @@ export interface LoyaltyAccount {
   totalOrders: number;
   totalSpent: number;
   createdAt: string;
+  birthday?: string;
 }
 
 interface LoyaltyContextType {
@@ -17,6 +18,8 @@ interface LoyaltyContextType {
   redeemPoints: (phone: string, pointsToRedeem: number) => { success: boolean; remainingPoints: number };
   getAccount: (phone: string) => LoyaltyAccount | undefined;
   getPointsValue: (points: number) => number;
+  updateBirthday: (phone: string, birthday: string) => void;
+  claimBirthdayReward: (phone: string) => boolean;
 }
 
 const LoyaltyContext = createContext<LoyaltyContextType | undefined>(undefined);
@@ -89,11 +92,29 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
   };
 
   const getPointsValue = (points: number) => {
-    return points * 0.1; // 1 point = 0.1 QAR
+    return points * 0.1;
+  };
+
+  const updateBirthday = (phone: string, birthday: string) => {
+    const newAccounts = accounts.map((a) => (a.phone === phone ? { ...a, birthday } : a));
+    saveAccounts(newAccounts);
+  };
+
+  const claimBirthdayReward = (phone: string) => {
+    const account = accounts.find((a) => a.phone === phone);
+    if (!account || !account.birthday) return false;
+    const today = new Date().toISOString().slice(5, 10);
+    const birthday = account.birthday.slice(5, 10);
+    if (today === birthday) {
+      const newAccounts = accounts.map((a) => (a.phone === phone ? { ...a, points: a.points + 50 } : a));
+      saveAccounts(newAccounts);
+      return true;
+    }
+    return false;
   };
 
   return (
-    <LoyaltyContext.Provider value={{ accounts, addPoints, redeemPoints, getAccount, getPointsValue }}>
+    <LoyaltyContext.Provider value={{ accounts, addPoints, redeemPoints, getAccount, getPointsValue, updateBirthday, claimBirthdayReward }}>
       {children}
     </LoyaltyContext.Provider>
   );

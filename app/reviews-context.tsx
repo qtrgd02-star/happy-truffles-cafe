@@ -68,6 +68,7 @@ export function ReviewsProvider({ children }: { children: ReactNode }) {
       rating: review.rating,
       status: "pending",
       createdAt: new Date().toISOString(),
+      photo: review.photo,
     };
     setReviews((prev) => [newReview, ...prev]);
     try {

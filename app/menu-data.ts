@@ -11,6 +11,19 @@ export interface MenuItem {
   icon: LucideIcon;
   image: string;
   sizes?: { name: string; price: number }[];
+  nutrition?: {
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    sugar: number;
+    fiber: number;
+    servingSize: string;
+  };
+  allergens?: {
+    contains: string[];
+    mayContain: string[];
+  };
 }
 
 export const menuItems: MenuItem[] = [
@@ -23,6 +36,8 @@ export const menuItems: MenuItem[] = [
     icon: Cookie,
     category: "Truffles",
     image: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=172&height=172",
+    nutrition: { calories: 180, protein: 2, carbs: 22, fat: 10, sugar: 18, fiber: 1, servingSize: "6 pieces" },
+    allergens: { contains: ["milk", "soy"], mayContain: ["nuts", "gluten"] },
   },
   {
     id: 2,
@@ -63,6 +78,8 @@ export const menuItems: MenuItem[] = [
     icon: Cookie,
     category: "Coffee",
     image: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/157dd11f-d5e0-45b6-b411-2dfcd45715f6.jpg?width=172&height=172",
+    nutrition: { calories: 15, protein: 0, carbs: 3, fat: 0, sugar: 0, fiber: 0, servingSize: "1 liter" },
+    allergens: { contains: [], mayContain: ["milk"] },
   },
   {
     id: 6,

@@ -9,6 +9,7 @@ export interface CartItem {
   image: string;
   quantity: number;
   notes?: string;
+  customizations?: { name: string; values: string[]; priceAdjustment: number }[];
 }
 
 interface CartContextType {

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useOrderHistory } from "@/app/order-history-context";
 import { useTables } from "@/app/table-context";
-import { motion, AnimatePresence } from "framer-motion";
-import { Clock, ChefHat, CheckCircle2, Package, Utensils } from "lucide-react";
+import { motion } from "framer-motion";
+import { Clock, ChefHat, CheckCircle2 } from "lucide-react";
+import { menuItems } from "@/app/menu-data";
 
 const statusConfig = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -18,6 +19,7 @@ export default function OrderStatusBoard() {
   const { orders } = useOrderHistory();
   const { tables } = useTables();
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [showMenu, setShowMenu] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -38,63 +40,84 @@ export default function OrderStatusBoard() {
       <div className="max-w-7xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="font-playfair text-4xl font-bold text-chocolate">Order Status</h1>
-            <p className="text-chocolate/60 mt-1">Happy Truffles Cafe - Live Order Board</p>
+            <h1 className="font-playfair text-4xl font-bold text-chocolate">{showMenu ? "Digital Menu Board" : "Order Status"}</h1>
+            <p className="text-chocolate/60 mt-1">Happy Truffles Cafe - {showMenu ? "Live Menu" : "Live Order Board"}</p>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-chocolate">{currentTime.toLocaleTimeString()}</p>
-            <p className="text-sm text-chocolate/60">{currentTime.toLocaleDateString()}</p>
+          <div className="flex items-center gap-4">
+            <button onClick={() => setShowMenu(!showMenu)} className="bg-truffle text-white px-4 py-2 rounded-full font-medium hover:bg-chocolate transition-colors">
+              {showMenu ? "Show Orders" : "Show Menu"}
+            </button>
+            <div className="text-right">
+              <p className="text-2xl font-bold text-chocolate">{currentTime.toLocaleTimeString()}</p>
+              <p className="text-sm text-chocolate/60">{currentTime.toLocaleDateString()}</p>
+            </div>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeOrders.map((order) => {
-            const StatusIcon = statusConfig[order.status].icon;
-            return (
-              <motion.div
-                key={order.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`bg-white rounded-2xl shadow-lg border-2 p-6 ${order.status === "ready" ? "border-green-400" : "border-chocolate/10"}`}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <h3 className="font-playfair text-2xl font-bold text-chocolate">{getTableNumber(order.tableId)}</h3>
-                    <p className="text-sm text-chocolate/60">Order {order.id}</p>
-                  </div>
-                  <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${statusConfig[order.status].color}`}>
-                    <StatusIcon size={16} />
-                    {statusConfig[order.status].label}
-                  </span>
+        {showMenu ? (
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {menuItems.slice(0, 12).map((item) => (
+              <div key={item.id} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
+                <div className="aspect-square bg-vanilla/40">
+                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
                 </div>
-
-                <div className="space-y-2 mb-4">
-                  {order.items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between bg-vanilla/20 rounded-lg p-3">
-                      <div>
-                        <p className="font-medium text-chocolate">{item.title}</p>
-                        <p className="text-xs text-chocolate/60">x{item.quantity}</p>
-                      </div>
+                <div className="p-4">
+                  <h3 className="font-playfair text-lg font-bold text-chocolate">{item.title}</h3>
+                  <p className="text-truffle font-bold text-xl mt-1">QAR {item.price}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeOrders.map((order) => {
+              const StatusIcon = statusConfig[order.status].icon;
+              return (
+                <motion.div
+                  key={order.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={`bg-white rounded-2xl shadow-lg border-2 p-6 ${order.status === "ready" ? "border-green-400" : "border-chocolate/10"}`}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <div>
+                      <h3 className="font-playfair text-2xl font-bold text-chocolate">{getTableNumber(order.tableId)}</h3>
+                      <p className="text-sm text-chocolate/60">Order {order.id}</p>
                     </div>
-                  ))}
-                </div>
-
-                {order.notes && (
-                  <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
-                    <p className="text-xs text-yellow-800">{order.notes}</p>
+                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${statusConfig[order.status].color}`}>
+                      <StatusIcon size={16} />
+                      {statusConfig[order.status].label}
+                    </span>
                   </div>
-                )}
 
-                <div className="flex items-center justify-between text-sm text-chocolate/60">
-                  <span>{new Date(order.createdAt).toLocaleTimeString()}</span>
-                  {order.cashierName && <span>{order.cashierName}</span>}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+                  <div className="space-y-2 mb-4">
+                    {order.items.map((item) => (
+                      <div key={item.id} className="flex items-center justify-between bg-vanilla/20 rounded-lg p-3">
+                        <div>
+                          <p className="font-medium text-chocolate">{item.title}</p>
+                          <p className="text-xs text-chocolate/60">x{item.quantity}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
 
-        {activeOrders.length === 0 && (
+                  {order.notes && (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mb-4">
+                      <p className="text-xs text-yellow-800">{order.notes}</p>
+                    </div>
+                  )}
+
+                  <div className="flex items-center justify-between text-sm text-chocolate/60">
+                    <span>{new Date(order.createdAt).toLocaleTimeString()}</span>
+                    {order.cashierName && <span>{order.cashierName}</span>}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
+
+        {activeOrders.length === 0 && !showMenu && (
           <div className="bg-white rounded-3xl shadow-xl p-12 text-center">
             <CheckCircle2 className="text-green-500 mx-auto mb-4" size={64} />
             <h2 className="font-playfair text-3xl text-chocolate font-bold mb-2">All Caught Up!</h2>
@@ -102,7 +125,7 @@ export default function OrderStatusBoard() {
           </div>
         )}
 
-        {recentCompleted.length > 0 && (
+        {recentCompleted.length > 0 && !showMenu && (
           <div className="mt-12">
             <h2 className="font-playfair text-2xl font-bold text-chocolate mb-6">Recently Completed</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">

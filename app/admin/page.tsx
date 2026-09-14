@@ -27,10 +27,14 @@ import {
   X,
   MessageSquare,
   Star,
+  UtensilsCrossed,
+  Building2,
+  MessageCircle,
+  ShoppingCart,
 } from "lucide-react";
 import Link from "next/link";
 
-type Tab = "orders" | "reservations" | "tables" | "menu" | "settings" | "analytics" | "reviews";
+type Tab = "orders" | "reservations" | "tables" | "menu" | "settings" | "analytics" | "reviews" | "subscriptions" | "corporate" | "whatsapp" | "talabat";
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: typeof Package }> = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -171,6 +175,42 @@ export default function AdminPage() {
           >
             <MessageSquare size={18} className="inline mr-2" />
             Reviews
+          </button>
+          <button
+            onClick={() => setTab("subscriptions")}
+            className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              tab === "subscriptions" ? "bg-truffle text-white" : "bg-white text-chocolate hover:bg-chocolate/5"
+            }`}
+          >
+            <UtensilsCrossed size={18} className="inline mr-2" />
+            Subscriptions
+          </button>
+          <button
+            onClick={() => setTab("corporate")}
+            className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              tab === "corporate" ? "bg-truffle text-white" : "bg-white text-chocolate hover:bg-chocolate/5"
+            }`}
+          >
+            <Building2 size={18} className="inline mr-2" />
+            Corporate
+          </button>
+          <button
+            onClick={() => setTab("whatsapp")}
+            className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              tab === "whatsapp" ? "bg-truffle text-white" : "bg-white text-chocolate hover:bg-chocolate/5"
+            }`}
+          >
+            <MessageCircle size={18} className="inline mr-2" />
+            WhatsApp
+          </button>
+          <button
+            onClick={() => setTab("talabat")}
+            className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              tab === "talabat" ? "bg-truffle text-white" : "bg-white text-chocolate hover:bg-chocolate/5"
+            }`}
+          >
+            <ShoppingCart size={18} className="inline mr-2" />
+            External Orders
           </button>
         </div>
 
@@ -756,6 +796,38 @@ export default function AdminPage() {
           )}
         </AnimatePresence>
       </div>
+
+        {tab === "subscriptions" && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+            <UtensilsCrossed size={48} className="text-chocolate/20 mx-auto mb-4" />
+            <p className="text-chocolate/60 mb-4">Manage subscriptions at the Subscriptions page.</p>
+            <Link href="/subscriptions" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to Subscriptions</Link>
+          </div>
+        )}
+
+        {tab === "corporate" && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+            <Building2 size={48} className="text-chocolate/20 mx-auto mb-4" />
+            <p className="text-chocolate/60 mb-4">Manage corporate accounts at the Corporate page.</p>
+            <Link href="/corporate" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to Corporate</Link>
+          </div>
+        )}
+
+        {tab === "whatsapp" && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+            <MessageCircle size={48} className="text-chocolate/20 mx-auto mb-4" />
+            <p className="text-chocolate/60 mb-4">Manage WhatsApp bot at the WhatsApp page.</p>
+            <Link href="/whatsapp" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to WhatsApp</Link>
+          </div>
+        )}
+
+        {tab === "talabat" && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+            <ShoppingCart size={48} className="text-chocolate/20 mx-auto mb-4" />
+            <p className="text-chocolate/60 mb-4">Manage external orders at the External Orders page.</p>
+            <Link href="/admin/talabat" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to External Orders</Link>
+          </div>
+        )}
     </div>
   );
 }

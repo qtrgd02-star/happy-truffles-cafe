@@ -146,8 +146,17 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                                  >
                                    <span className="text-chocolate text-xs leading-none">+</span>
                                  </button>
-                               </div>
-                               <input
+                                </div>
+                                {item.customizations && item.customizations.length > 0 && (
+                                  <div className="space-y-1 mb-2">
+                                    {item.customizations.map((c, i) => (
+                                      <p key={i} className="text-xs text-chocolate/60">
+                                        {c.name}: {c.values.join(", ")} {c.priceAdjustment > 0 && `(+QAR ${c.priceAdjustment})`}
+                                      </p>
+                                    ))}
+                                  </div>
+                                )}
+                                <input
                                  type="text"
                                  value={itemNotes[item.id] ?? item.notes ?? ""}
                                  onChange={(e) => {

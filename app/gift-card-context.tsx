@@ -6,6 +6,10 @@ export interface GiftCard {
   code: string;
   balance: number;
   createdAt: string;
+  recipientEmail?: string;
+  recipientPhone?: string;
+  message?: string;
+  mailed: boolean;
 }
 
 interface GiftCardContextType {
@@ -14,6 +18,7 @@ interface GiftCardContextType {
   redeemGiftCard: (code: string) => number;
   applyGiftCard: (code: string) => { success: boolean; balance: number; message: string };
   getGiftCardBalance: (code: string) => number;
+  mailGiftCard: (code: string, email: string, phone: string, message?: string) => void;
 }
 
 const GiftCardContext = createContext<GiftCardContextType | undefined>(undefined);
@@ -43,9 +48,20 @@ export function GiftCardProvider({ children }: { children: ReactNode }) {
       code,
       balance: amount,
       createdAt: new Date().toISOString(),
+      mailed: false,
     };
     setGiftCards((prev) => [...prev, newCard]);
     return code;
+  };
+
+  const mailGiftCard = (code: string, email: string, phone: string, message?: string) => {
+    setGiftCards((prev) =>
+      prev.map((card) =>
+        card.code === code
+          ? { ...card, recipientEmail: email, recipientPhone: phone, message, mailed: true }
+          : card
+      )
+    );
   };
 
   const redeemGiftCard = (code: string): number => {
@@ -68,7 +84,7 @@ export function GiftCardProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <GiftCardContext.Provider value={{ giftCards, createGiftCard, redeemGiftCard, applyGiftCard, getGiftCardBalance }}>
+    <GiftCardContext.Provider value={{ giftCards, createGiftCard, redeemGiftCard, applyGiftCard, getGiftCardBalance, mailGiftCard }}>
       {children}
     </GiftCardContext.Provider>
   );

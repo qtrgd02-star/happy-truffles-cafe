@@ -9,15 +9,18 @@ export interface Table {
   status: "available" | "occupied" | "reserved";
   orderId?: string;
   reservationId?: string;
+  qrCode?: string;
+  qrUrl?: string;
 }
 
 interface TableContextType {
   tables: Table[];
-  addTable: (table: Omit<Table, "id">) => void;
+  addTable: (table: Omit<Table, "id" | "qrCode" | "qrUrl">) => void;
   updateTable: (id: string, updates: Partial<Omit<Table, "id">>) => void;
   removeTable: (id: string) => void;
   clearTables: () => void;
   syncTables: () => Promise<void>;
+  generateQR: (id: string) => void;
 }
 
 const TableContext = createContext<TableContextType | undefined>(undefined);
@@ -57,9 +60,13 @@ export function TableProvider({ children }: { children: ReactNode }) {
   }, [tables]);
 
   const addTable = (table: Omit<Table, "id">) => {
+    const qrCode = `table_${table.number}_${Date.now()}`;
+    const qrUrl = `/tables-qr?table=${table.number}&code=${qrCode}`;
     const newTable: Table = {
       ...table,
       id: Date.now().toString(),
+      qrCode,
+      qrUrl,
     };
     setTables((prev) => [...prev, newTable]);
     syncToApi();
@@ -80,7 +87,7 @@ export function TableProvider({ children }: { children: ReactNode }) {
   const clearTables = () => setTables([]);
 
   return (
-    <TableContext.Provider value={{ tables, addTable, updateTable, removeTable, clearTables, syncTables: syncToApi }}>
+    <TableContext.Provider value={{ tables, addTable, updateTable, removeTable, clearTables, syncTables: syncToApi, generateQR: () => {} }}>
       {children}
     </TableContext.Provider>
   );
