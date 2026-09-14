@@ -33,9 +33,61 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Happy Truffles Cafe | Doha, Qatar",
-  description:
-    "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in Gold Plaza, Abu Hamour, Doha, Qatar.",
+  title: {
+    default: "Happy Truffles Cafe | Artisan Chocolate & Coffee | Doha, Qatar",
+    template: "%s | Happy Truffles Cafe"
+  },
+  description: "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in Gold Plaza, Abu Hamour, Doha, Qatar. Order online for delivery or dine-in.",
+  keywords: ["happy truffles cafe", "chocolate truffles", "specialty coffee", "matcha", "doha cafe", "abu hamour", "gold plaza", "qatar restaurant", "cafe doha", "artisan chocolate", "cafe near me"],
+  authors: [{ name: "Happy Truffles Cafe" }],
+  creator: "Happy Truffles Cafe",
+  publisher: "Happy Truffles Cafe",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "Happy Truffles Cafe | Artisan Chocolate & Coffee | Doha, Qatar",
+    description: "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in Doha, Qatar.",
+    siteName: "Happy Truffles Cafe",
+    images: [
+      {
+        url: "/hero.jpg",
+        width: 1200,
+        height: 630,
+        alt: "Happy Truffles Cafe - Artisan Chocolate and Coffee",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Happy Truffles Cafe | Artisan Chocolate & Coffee | Doha, Qatar",
+    description: "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in Doha, Qatar.",
+    images: ["/hero.jpg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({
