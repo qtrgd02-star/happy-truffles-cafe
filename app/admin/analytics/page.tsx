@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
@@ -35,8 +35,8 @@ export default function AdminAnalyticsPage() {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 
-  const maxHourlySale = Math.max(...analytics.salesByHour.map((h) => h.sales));
-  const maxDailySale = Math.max(...analytics.salesByDay.map((d) => d.sales));
+  const maxHourlySale = analytics.salesByHour.length > 0 ? Math.max(...analytics.salesByHour.map((h) => h.sales)) : 0;
+  const maxDailySale = analytics.salesByDay.length > 0 ? Math.max(...analytics.salesByDay.map((d) => d.sales)) : 0;
 
   return (
     <div className="min-h-screen bg-vanilla/30 py-12 px-4">
@@ -90,7 +90,7 @@ export default function AdminAnalyticsPage() {
               <Users className="text-rose-500" size={24} />
               <span className="text-xs text-chocolate/60">Peak</span>
             </div>
-            <p className="text-3xl font-bold text-chocolate">{analytics.salesByHour.reduce((max, h) => h.sales > max.sales ? h : max).hour}</p>
+            <p className="text-3xl font-bold text-chocolate">{analytics.salesByHour.length > 0 ? analytics.salesByHour.reduce((max, h) => h.sales > max.sales ? h : max).hour : "N/A"}</p>
             <p className="text-sm text-chocolate/60 mt-1">Peak Hour</p>
           </motion.div>
         </div>
@@ -123,7 +123,7 @@ export default function AdminAnalyticsPage() {
                 <div key={index} className="flex-1 flex flex-col items-center">
                   <div
                     className="w-full bg-truffle/20 rounded-t hover:bg-truffle/40 transition-colors"
-                    style={{ height: (hour.sales / maxHourlySale) * 100 + "%" }}
+                    style={{ height: maxHourlySale > 0 ? (hour.sales / maxHourlySale) * 100 + "%" : "0%" }}
                   />
                   <span className="text-[10px] text-chocolate/60 mt-1">{hour.hour}</span>
                 </div>
@@ -139,7 +139,7 @@ export default function AdminAnalyticsPage() {
               <div key={index} className="flex-1 flex flex-col items-center">
                 <div
                   className="w-full bg-truffle/20 rounded-t hover:bg-truffle/40 transition-colors"
-                  style={{ height: (day.sales / maxDailySale) * 100 + "%" }}
+                  style={{ height: maxDailySale > 0 ? (day.sales / maxDailySale) * 100 + "%" : "0%" }}
                 />
                 <span className="text-xs text-chocolate/60 mt-1">{day.day}</span>
               </div>
@@ -150,3 +150,5 @@ export default function AdminAnalyticsPage() {
     </div>
   );
 }
+
+
