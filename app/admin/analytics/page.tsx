@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import { BarChart3, TrendingUp, Package, Users, DollarSign, Calendar } from "lucide-react";
 
@@ -17,11 +17,7 @@ export default function AdminAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [timeRange, setTimeRange] = useState("7d");
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, [timeRange]);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       const res = await fetch(`/api/admin/analytics?range=${timeRange}`);
       const data = await res.json();
@@ -29,7 +25,11 @@ export default function AdminAnalyticsPage() {
     } catch (e) {
       console.error("Failed to fetch analytics:", e);
     }
-  };
+  }, [timeRange]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   if (!analytics) {
     return <div className="flex items-center justify-center h-screen">Loading...</div>;

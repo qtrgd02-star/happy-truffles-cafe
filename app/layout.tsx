@@ -18,6 +18,14 @@ import { ReviewsProvider } from "./reviews-context";
 import { ShiftProvider } from "./shift-context";
 import { StaffProvider } from "./staff-context";
 import { InventoryProvider } from "./inventory-context";
+import { OrderScheduleProvider } from "./order-schedule-context";
+import { SplitBillingProvider } from "./split-billing-context";
+import { WaitlistProvider } from "./waitlist-context";
+import { ReferralProvider } from "./referral-context";
+import { DriverProvider } from "./driver-context";
+import { CateringProvider } from "./catering-context";
+import { SeasonalMenuProvider } from "./seasonal-menu-context";
+import { StaffScheduleProvider } from "./staff-schedule-context";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -90,6 +98,8 @@ export const metadata: Metadata = {
   },
 };
 
+import { ServiceWorkerRegistrar } from "./components/service-worker-registrar";
+
 export default function RootLayout({
   children,
 }: {
@@ -98,39 +108,60 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${jakarta.variable} font-jakarta antialiased`}>
-        <ThemeProvider>\n        <CustomerProvider>\n        <CartProvider>
-          <ToastProvider>
-            <WishlistProvider>
-              <RecentlyViewedProvider>
-                <PromoProvider>
-                  <OrderHistoryProvider>
-                    <ReservationProvider>
-                      <AuthProvider>
-                        <LoyaltyProvider>
-                          <GiftCardProvider>
-                            <LanguageProvider>
-                              <TableProvider>
-                                <ReviewsProvider>
-                                  <ShiftProvider>
-                                    <StaffProvider>
-                                      <InventoryProvider>
-                                        {children}
-                                      </InventoryProvider>
-                                    </StaffProvider>
-                                  </ShiftProvider>
-                                </ReviewsProvider>
-                              </TableProvider>
-                            </LanguageProvider>
-                          </GiftCardProvider>
-                        </LoyaltyProvider>
-                      </AuthProvider>
-                    </ReservationProvider>
-                  </OrderHistoryProvider>
-                </PromoProvider>
-              </RecentlyViewedProvider>
-            </WishlistProvider>
-          </ToastProvider>
-        </CartProvider>\n        </CustomerProvider>\n      </ThemeProvider>
+        <ThemeProvider>
+          <CustomerProvider>
+          <CartProvider>
+            <ToastProvider>
+              <WishlistProvider>
+                <RecentlyViewedProvider>
+                  <PromoProvider>
+                    <OrderHistoryProvider>
+                      <ReservationProvider>
+                        <AuthProvider>
+                          <LoyaltyProvider>
+                            <GiftCardProvider>
+                              <LanguageProvider>
+                                <TableProvider>
+                                  <ReviewsProvider>
+                                    <ShiftProvider>
+                                      <StaffProvider>
+                                        <InventoryProvider>
+                                          <OrderScheduleProvider>
+                                            <SplitBillingProvider>
+                                              <WaitlistProvider>
+                                                <ReferralProvider>
+                                                  <DriverProvider>
+                                                    <CateringProvider>
+                                                      <SeasonalMenuProvider>
+                                                      <StaffScheduleProvider>
+                                                        <ServiceWorkerRegistrar />
+                                                        {children}
+                                                      </StaffScheduleProvider>
+                                                    </SeasonalMenuProvider>
+                                                    </CateringProvider>
+                                                  </DriverProvider>
+                                                </ReferralProvider>
+                                              </WaitlistProvider>
+                                            </SplitBillingProvider>
+                                          </OrderScheduleProvider>
+                                        </InventoryProvider>
+                                      </StaffProvider>
+                                    </ShiftProvider>
+                                  </ReviewsProvider>
+                                </TableProvider>
+                              </LanguageProvider>
+                            </GiftCardProvider>
+                          </LoyaltyProvider>
+                        </AuthProvider>
+                      </ReservationProvider>
+                    </OrderHistoryProvider>
+                  </PromoProvider>
+                </RecentlyViewedProvider>
+              </WishlistProvider>
+            </ToastProvider>
+          </CartProvider>
+          </CustomerProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
