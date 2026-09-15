@@ -14,7 +14,7 @@ export const metadata: MetadataRoute = {
   },
 };
 
-export default function robots() {
+export default function GET() {
   return new Response(
     `User-agent: *
 Allow: /
