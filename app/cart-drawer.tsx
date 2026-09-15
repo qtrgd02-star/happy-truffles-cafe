@@ -8,13 +8,16 @@ import { X, Trash2, ShoppingCart, ArrowRight, Tag, MessageCircle } from "lucide-
 import Link from "next/link";
 import Image from "next/image";
 
-export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
+export default function CartDrawer({ scrolled, isOpen, onClose }: { scrolled?: boolean; isOpen?: boolean; onClose?: () => void } = {}) {
   const { cart, removeFromCart, updateQuantity, updateItemNotes, clearCart, cartTotal, cartCount } = useCart();
   const { appliedPromo, getDiscount, applyPromo, removePromo } = usePromos();
-  const [isOpen, setIsOpen] = useState(false);
   const [promoInput, setPromoInput] = useState("");
   const [itemNotes, setItemNotes] = useState<Record<number, string>>({});
   const [promoMessage, setPromoMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const [internalOpen, setInternalOpen] = useState(false);
+  
+  const drawerOpen = isOpen ?? internalOpen;
+  const setDrawerOpen = onClose ? (() => { onClose(); }) : setInternalOpen;
 
   const discount = getDiscount(cartTotal);
   const finalTotal = cartTotal - discount;
@@ -42,7 +45,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
   return (
     <>
       <button
-        onClick={() => setIsOpen(true)}
+        onClick={() => setDrawerOpen(true)}
         className={`relative transition-colors ${
           scrolled ? "text-chocolate/80 hover:text-truffle" : "text-white/80 hover:text-white"
         }`}
@@ -57,13 +60,13 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
       </button>
 
       <AnimatePresence>
-        {isOpen && (
+        {drawerOpen && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsOpen(false)}
+              onClick={() => setDrawerOpen(false)}
               className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
             />
             <motion.div
@@ -78,7 +81,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                   Your Cart ({cartCount})
                 </h2>
                 <button
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => setDrawerOpen(false)}
                   className="text-chocolate/60 hover:text-chocolate transition-colors"
                 >
                   <X size={24} />
@@ -93,7 +96,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                     <p className="text-chocolate/40 text-sm">Add items from our menu to get started</p>
                     <Link
                       href="/#menu"
-                      onClick={() => setIsOpen(false)}
+                      onClick={() => setDrawerOpen(false)}
                       className="mt-4 bg-truffle text-white px-6 py-2 rounded-full font-semibold hover:bg-chocolate transition-colors"
                     >
                       Browse Menu
@@ -137,7 +140,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
                                    className="w-6 h-6 rounded-full border border-chocolate/20 flex items-center justify-center hover:bg-chocolate/5 transition-colors"
                                  >
-                                   <span className="text-chocolate text-xs leading-none">−</span>
+                                   <span className="text-chocolate text-xs leading-none">-</span>
                                  </button>
                                  <span className="w-6 text-center text-sm">{item.quantity}</span>
                                  <button
@@ -238,7 +241,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                   </div>
                   <div className="flex justify-end">
                     <button
-                      onClick={() => { clearCart(); setIsOpen(false); }}
+                      onClick={() => { clearCart(); setDrawerOpen(false); }}
                       className="text-red-500 hover:text-red-600 text-sm font-medium"
                     >
                       Clear Cart
@@ -251,7 +254,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                   <Link
                     href="/checkout"
                     className="w-full bg-truffle text-white py-4 rounded-full font-semibold hover:bg-chocolate transition-colors shadow-lg shadow-truffle/20 flex items-center justify-center gap-2"
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => setDrawerOpen(false)}
                   >
                     Proceed to Checkout
                     <ArrowRight size={18} />
@@ -259,7 +262,7 @@ export default function CartDrawer({ scrolled }: { scrolled?: boolean } = {}) {
                   <Link
                     href="/cart"
                     className="w-full border-2 border-chocolate/20 text-chocolate py-3 rounded-full font-semibold hover:bg-chocolate/5 transition-colors flex items-center justify-center"
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => setDrawerOpen(false)}
                   >
                     View Full Cart
                   </Link>

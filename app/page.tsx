@@ -30,6 +30,7 @@ import {
   LogOut,
   User,
   Tag,
+  ShoppingCart,
 } from "lucide-react";
 
 const fadeUp = {
@@ -195,12 +196,13 @@ export default function Home() {
   const { language, setLanguage } = useLanguage();
   const { reviews, addReview, refreshReviews } = useReviews();
   const { promos } = usePromos();
-  const { addToCart } = useCart();
+  const { addToCart, cartCount } = useCart();
   const { showToast } = useToast();
   const [scrolled, setScrolled] = useState(false);
   const [showPromoPopup, setShowPromoPopup] = useState(false);
   const [promoPopupDismissed, setPromoPopupDismissed] = useState(false);
   const [itemQuantities, setItemQuantities] = useState<Record<number, number>>({});
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const isPromoValid = (promo: any) => {
     if (!promo.validUntil) return true;
@@ -465,7 +467,7 @@ export default function Home() {
                     <User size={20} />
                   </Link>
                 )}
-                <CartDrawer scrolled={true} />
+                <CartDrawer scrolled={true} isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
               <div
                 className={`transition-all duration-300 relative ${
                   isSearchOpen ? "w-64 opacity-100" : "w-0 opacity-0"
@@ -540,6 +542,13 @@ export default function Home() {
               >
                 Visit Us
               </a>
+              <button
+                onClick={() => { setIsCartOpen(true); setMobileOpen(false); }}
+                className="w-full mt-3 bg-truffle text-white px-6 py-3 rounded-full font-medium hover:bg-chocolate transition-colors flex items-center justify-center gap-2"
+              >
+                <ShoppingCart size={18} />
+                View Cart {cartCount > 0 && `(${cartCount})`}
+              </button>
             </div>
           </motion.div>
         )}
