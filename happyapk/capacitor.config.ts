@@ -5,13 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Happy Truffles Cafe',
   webDir: 'dist',
   server: {
-    androidScheme: 'https',
-    allowNavigation: [
-      'localhost:3000',
-      '10.0.2.2:3000',
-      '192.168.*',
-      '*.happytruffles.qa'
-    ]
+    url: 'http://10.0.2.2:3000',
+    cleartext: true
   },
   plugins: {
     PushNotifications: {
