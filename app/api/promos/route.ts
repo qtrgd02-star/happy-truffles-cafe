@@ -27,16 +27,29 @@ function writeLocalPromos(promos: any[]) {
   writeFileSync(promosFile, JSON.stringify(promos, null, 2));
 }
 
+function filterValidPromos(promos: any[]) {
+  const now = new Date();
+  return promos.filter((p) => {
+    if (!p.active) return false;
+    if (p.validUntil) {
+      const until = new Date(p.validUntil);
+      const endOfDay = new Date(until.getFullYear(), until.getMonth(), until.getDate() + 1);
+      if (now >= endOfDay) return false;
+    }
+    return true;
+  });
+}
+
 export async function GET() {
   try {
     const snapshot = await getDocs(collection(db, "promos"));
-    const promos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    let promos = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     if (promos.length > 0) {
-      return NextResponse.json(promos);
+      return NextResponse.json(filterValidPromos(promos));
     }
-    return NextResponse.json(readLocalPromos());
+    return NextResponse.json(filterValidPromos(readLocalPromos()));
   } catch {
-    return NextResponse.json(readLocalPromos());
+    return NextResponse.json(filterValidPromos(readLocalPromos()));
   }
 }
 

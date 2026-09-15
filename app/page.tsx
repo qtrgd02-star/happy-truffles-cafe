@@ -202,12 +202,20 @@ export default function Home() {
   const [promoPopupDismissed, setPromoPopupDismissed] = useState(false);
   const [itemQuantities, setItemQuantities] = useState<Record<number, number>>({});
 
+  const isPromoValid = (promo: any) => {
+    if (!promo.validUntil) return true;
+    const until = new Date(promo.validUntil);
+    const now = new Date();
+    const endOfDay = new Date(until.getFullYear(), until.getMonth(), until.getDate() + 1);
+    return now < endOfDay;
+  };
+
   useEffect(() => {
     refreshReviews();
   }, [refreshReviews]);
 
   useEffect(() => {
-    const activePromos = promos.filter((p) => p.active);
+    const activePromos = promos.filter((p) => p.active && isPromoValid(p));
     if (activePromos.length > 0 && !promoPopupDismissed) {
       const timer = setTimeout(() => {
         setShowPromoPopup(true);
@@ -538,7 +546,7 @@ export default function Home() {
       </motion.nav>
 
       {/* Promo Popup */}
-      {showPromoPopup && promos.filter((p) => p.active).length > 0 && (
+      {showPromoPopup && promos.filter((p) => p.active && isPromoValid(p)).length > 0 && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => { setShowPromoPopup(false); setPromoPopupDismissed(true); }} />
           
@@ -623,7 +631,7 @@ export default function Home() {
               You have a special offer!
             </motion.p>
 
-            {promos.filter((p) => p.active).slice(0, 1).map((promo) => (
+            {promos.filter((p) => p.active && isPromoValid(p)).slice(0, 1).map((promo) => (
               <motion.div
                 key={promo.id}
                 initial={{ scale: 0.8, opacity: 0 }}
@@ -1020,7 +1028,7 @@ export default function Home() {
       </section>
 
       {/* Promos Section */}
-      {promos.filter((p) => p.active).length > 0 && (
+      {promos.filter((p) => p.active && isPromoValid(p)).length > 0 && (
         <section className="py-24 px-4">
           <div className="max-w-7xl mx-auto">
             <motion.div
@@ -1038,7 +1046,7 @@ export default function Home() {
 
             <div className="grid md:grid-cols-3 gap-8">
               {promos
-                .filter((p) => p.active)
+                .filter((p) => p.active && isPromoValid(p))
                 .map((promo, index) => (
                   <motion.div
                     key={promo.id}

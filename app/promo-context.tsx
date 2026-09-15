@@ -135,7 +135,8 @@ export function PromoProvider({ children }: { children: ReactNode }) {
   }, [promos]);
 
   const getPromoByCode = useCallback((code: string) => {
-    return promos.find((p) => p.code.toLowerCase() === code.toLowerCase() && p.active);
+    const now = new Date();
+    return promos.find((p) => p.code.toLowerCase() === code.toLowerCase() && p.active && new Date(p.validUntil) >= now);
   }, [promos]);
 
   const applyPromo = useCallback((code: string, orderTotal: number, items: any[] = []) => {
