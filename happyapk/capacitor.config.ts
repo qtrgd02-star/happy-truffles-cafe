@@ -5,8 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Happy Truffles Cafe',
   webDir: 'dist',
   server: {
-    url: 'http://10.0.2.2:3000',
-    cleartext: true
+    url: 'https://happy-truffles-cafe-kwiev263s-dtwo1.vercel.app',
+    cleartext: false
   },
   plugins: {
     PushNotifications: {
