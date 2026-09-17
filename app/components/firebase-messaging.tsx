@@ -8,11 +8,13 @@ export function FirebaseMessaging() {
   useEffect(() => {
     if (!messaging) return;
 
+    const fcm = messaging;
+
     const requestPermission = async () => {
       try {
         const permission = await Notification.requestPermission();
         if (permission === "granted") {
-          const token = await getToken(messaging, {
+          const token = await getToken(fcm, {
             vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
           });
           console.log("FCM Token:", token);
@@ -24,7 +26,7 @@ export function FirebaseMessaging() {
 
     requestPermission();
 
-    const unsubscribe = onMessage(messaging, (payload) => {
+    const unsubscribe = onMessage(fcm, (payload) => {
       console.log("Received foreground message:", payload);
       if (payload.notification) {
         alert(`${payload.notification.title}: ${payload.notification.body}`);
