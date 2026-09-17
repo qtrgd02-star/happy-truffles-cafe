@@ -1,9 +1,88 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
+    
+    // Users collection - users can read/write their own data
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+      allow create: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Orders - customers can create, staff/admin can update
+    match /orders/{orderId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        (resource.data.customer.email == request.auth.token.email || 
+         hasRole(request.auth, ['admin', 'staff']));
+      allow delete: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Menu items - public read, admin write
+    match /menuItems/{itemId} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Cart - users can manage their own cart
+    match /cart/{cartId} {
+      allow read: if request.auth != null && resource.data.userId == request.auth.uid;
+      allow write: if request.auth != null && request.auth.uid == cartId;
+    }
+    
+    // Reservations - customers can create, staff/admin can manage
+    match /reservations/{reservationId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update: if request.auth != null && 
+        (resource.data.customerEmail == request.auth.token.email || 
+         hasRole(request.auth, ['admin', 'staff']));
+      allow delete: if hasRole(request.auth, ['admin', 'staff']);
+    }
+    
+    // Promos - public read, admin write
+    match /promos/{promoId} {
+      allow read: if true;
+      allow write: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Staff - admin only
+    match /staff/{staffId} {
+      allow read: if request.auth != null && hasRole(request.auth, ['admin', 'staff']);
+      allow write: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Inventory - staff/admin only
+    match /inventory/{inventoryId} {
+      allow read: if request.auth != null && hasRole(request.auth, ['admin', 'staff']);
+      allow write: if hasRole(request.auth, ['admin', 'staff']);
+    }
+    
+    // Reviews - public read, authenticated users can create
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update: if hasRole(request.auth, ['admin']);
+      allow delete: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Tables - staff/admin only
+    match /tables/{tableId} {
+      allow read: if request.auth != null && hasRole(request.auth, ['admin', 'staff']);
+      allow write: if hasRole(request.auth, ['admin', 'staff']);
+    }
+    
+    // Default deny all other paths
+    match /{document=**} {
+      allow read, write: if false;
     }
   }
+}
+
+// Helper function to check user roles
+function hasRole(auth, roles) {
+  return auth != null && 
+    (auth.token.email == "admin@happytruffles.qa" || 
+     roles.hasAny([auth.token.role]));
 }
