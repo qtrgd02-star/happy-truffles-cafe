@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { useUser } from "@/app/user-context";
 
 export interface WishlistItem {
   id: number;
@@ -21,25 +22,28 @@ interface WishlistContextType {
 const WishlistContext = createContext<WishlistContextType | undefined>(undefined);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
+  const { getUserKey } = useUser();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
+
+  const getWishlistKey = () => getUserKey("wishlist");
 
   // Load from localStorage
   useEffect(() => {
-    const saved = localStorage.getItem("wishlist");
+    const saved = localStorage.getItem(getWishlistKey());
     if (saved) {
       try {
         setWishlist(JSON.parse(saved));
       } catch (e) {
         console.error("Failed to parse wishlist from localStorage", e);
-        localStorage.removeItem("wishlist");
+        localStorage.removeItem(getWishlistKey());
       }
     }
-  }, []);
+  }, [getWishlistKey]);
 
   // Save to localStorage
   useEffect(() => {
-    localStorage.setItem("wishlist", JSON.stringify(wishlist));
-  }, [wishlist]);
+    localStorage.setItem(getWishlistKey(), JSON.stringify(wishlist));
+  }, [wishlist, getWishlistKey]);
 
   const addToWishlist = (item: Omit<WishlistItem, "quantity">) => {
     setWishlist((prev) => {

@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { MenuItem } from "./menu-data";
+import { useUser } from "@/app/user-context";
 
 export interface RecentlyViewedItem {
   id: number;
@@ -21,23 +22,26 @@ const RecentlyViewedContext = createContext<RecentlyViewedContextType | undefine
 const MAX_RECENTLY_VIEWED = 8;
 
 export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
+  const { getUserKey } = useUser();
   const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedItem[]>([]);
 
+  const getRecentlyViewedKey = () => getUserKey("recentlyViewed");
+
   useEffect(() => {
-    const saved = localStorage.getItem("recentlyViewed");
+    const saved = localStorage.getItem(getRecentlyViewedKey());
     if (saved) {
       try {
         setRecentlyViewed(JSON.parse(saved));
       } catch (e) {
         console.error("Failed to parse recently viewed from localStorage", e);
-        localStorage.removeItem("recentlyViewed");
+        localStorage.removeItem(getRecentlyViewedKey());
       }
     }
-  }, []);
+  }, [getRecentlyViewedKey]);
 
   useEffect(() => {
-    localStorage.setItem("recentlyViewed", JSON.stringify(recentlyViewed));
-  }, [recentlyViewed]);
+    localStorage.setItem(getRecentlyViewedKey(), JSON.stringify(recentlyViewed));
+  }, [recentlyViewed, getRecentlyViewedKey]);
 
   const addToRecentlyViewed = (item: Pick<MenuItem, "id" | "title" | "price" | "image">) => {
     setRecentlyViewed((prev) => {

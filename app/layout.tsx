@@ -105,6 +105,7 @@ import { CustomizationProvider } from "./customization-context";
 import { CorporateProvider } from "./corporate-context";
 import { WhatsAppProvider } from "./whatsapp-context";
 import { BirthdayProvider } from "./birthday-context";
+import { UserProvider } from "./user-context";
 
 export default function RootLayout({
   children,
@@ -114,6 +115,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${playfair.variable} ${jakarta.variable} font-jakarta antialiased`}>
+      <UserProvider>
         <ThemeProvider>
           <CustomerProvider>
           <CartProvider>
@@ -139,22 +141,22 @@ export default function RootLayout({
                                                   <DriverProvider>
                                                     <CateringProvider>
                                                       <SeasonalMenuProvider>
-                                                       <StaffScheduleProvider>
+                                                        <StaffScheduleProvider>
                                                           <ServiceWorkerRegistrar />
                                                           <FirebaseMessaging />
                                                           <SubscriptionProvider>
-                                                           <CustomizationProvider>
-                                                             <CorporateProvider>
-                                                               <WhatsAppProvider>
-                                                                 <BirthdayProvider>
-                                                                   {children}
-                                                                 </BirthdayProvider>
-                                                               </WhatsAppProvider>
-                                                             </CorporateProvider>
-                                                           </CustomizationProvider>
-                                                         </SubscriptionProvider>
-                                                       </StaffScheduleProvider>
-                                                    </SeasonalMenuProvider>
+                                                            <CustomizationProvider>
+                                                              <CorporateProvider>
+                                                                <WhatsAppProvider>
+                                                                  <BirthdayProvider>
+                                                                    {children}
+                                                                  </BirthdayProvider>
+                                                                </WhatsAppProvider>
+                                                              </CorporateProvider>
+                                                            </CustomizationProvider>
+                                                          </SubscriptionProvider>
+                                                        </StaffScheduleProvider>
+                                                      </SeasonalMenuProvider>
                                                     </CateringProvider>
                                                   </DriverProvider>
                                                 </ReferralProvider>
@@ -177,8 +179,9 @@ export default function RootLayout({
               </WishlistProvider>
             </ToastProvider>
           </CartProvider>
-          </CustomerProvider>
-        </ThemeProvider>
+        </CustomerProvider>
+      </ThemeProvider>
+    </UserProvider>
       </body>
     </html>
   );

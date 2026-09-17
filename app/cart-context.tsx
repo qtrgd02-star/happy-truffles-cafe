@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from "react";
+import { useUser } from "@/app/user-context";
 
 export interface CartItem {
   id: number;
@@ -26,15 +27,16 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const CART_STORAGE_KEY = "cart";
-
 export function CartProvider({ children }: { children: ReactNode }) {
+  const { getUserKey } = useUser();
   const [cart, setCart] = useState<CartItem[]>([]);
   const isSyncingRef = useRef(false);
 
+  const getCartKey = () => getUserKey("cart");
+
   // Load cart from localStorage on initial mount
   useEffect(() => {
-    const saved = localStorage.getItem(CART_STORAGE_KEY);
+    const saved = localStorage.getItem(getCartKey());
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
@@ -43,10 +45,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         }
       } catch (e) {
         console.error("Failed to parse cart from localStorage", e);
-        localStorage.removeItem(CART_STORAGE_KEY);
+        localStorage.removeItem(getCartKey());
       }
     }
-  }, []);
+  }, [getCartKey]);
 
   const syncToApi = useCallback(async (cartData?: CartItem[]) => {
     if (isSyncingRef.current) return;
@@ -67,9 +69,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   // Save cart to localStorage and sync to API whenever it changes
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    localStorage.setItem(getCartKey(), JSON.stringify(cart));
     syncToApi(cart);
-  }, [cart, syncToApi]);
+  }, [cart, syncToApi, getCartKey]);
 
   const addToCart = (item: Omit<CartItem, "quantity">) => {
     setCart((prev) => {

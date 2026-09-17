@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { useUser } from "@/app/user-context";
 
 export interface CustomerProfile {
   id: string;
@@ -41,7 +42,7 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem("customerProfile");
+    const saved = localStorage.getItem(useUser().getUserKey("customerProfile"));
     if (saved) {
       setProfile(JSON.parse(saved));
     }
@@ -50,7 +51,7 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
 
   const saveProfile = (newProfile: CustomerProfile | null) => {
     if (newProfile) {
-      localStorage.setItem("customerProfile", JSON.stringify(newProfile));
+      localStorage.setItem(useUser().getUserKey("customerProfile"), JSON.stringify(newProfile));
     } else {
       localStorage.removeItem("customerProfile");
     }
@@ -111,7 +112,7 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
   };
 
   const loadProfile = useCallback((phone: string) => {
-    const saved = localStorage.getItem("customerProfile");
+    const saved = localStorage.getItem(useUser().getUserKey("customerProfile"));
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.phone === phone) {
