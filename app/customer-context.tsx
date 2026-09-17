@@ -38,22 +38,25 @@ interface CustomerContextType {
 const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
 
 export function CustomerProvider({ children }: { children: ReactNode }) {
+  const { getUserKey } = useUser();
   const [profile, setProfile] = useState<CustomerProfile | null>(null);
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
+  const profileKey = getUserKey("customerProfile");
+
   useEffect(() => {
-    const saved = localStorage.getItem(useUser().getUserKey("customerProfile"));
+    const saved = localStorage.getItem(profileKey);
     if (saved) {
       setProfile(JSON.parse(saved));
     }
     setIsProfileLoaded(true);
-  }, []);
+  }, [profileKey]);
 
   const saveProfile = (newProfile: CustomerProfile | null) => {
     if (newProfile) {
-      localStorage.setItem(useUser().getUserKey("customerProfile"), JSON.stringify(newProfile));
+      localStorage.setItem(profileKey, JSON.stringify(newProfile));
     } else {
-      localStorage.removeItem("customerProfile");
+      localStorage.removeItem(profileKey);
     }
     setProfile(newProfile);
   };
@@ -112,7 +115,7 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
   };
 
   const loadProfile = useCallback((phone: string) => {
-    const saved = localStorage.getItem(useUser().getUserKey("customerProfile"));
+    const saved = localStorage.getItem(profileKey);
     if (saved) {
       const parsed = JSON.parse(saved);
       if (parsed.phone === phone) {
@@ -121,7 +124,7 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
       }
     }
     return null;
-  }, []);
+  }, [profileKey]);
 
   return (
     <CustomerContext.Provider
