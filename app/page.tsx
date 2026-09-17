@@ -1281,10 +1281,10 @@ export default function Home() {
                 <div>
                   <h3 className="font-semibold text-chocolate dark:text-vanilla mb-1">Phone</h3>
                   <a
-                    href="tel:+97431590002"
+                    href="tel:+97412345678"
                     className="text-chocolate/70 hover:text-truffle transition-colors"
                   >
-                    +974 3159 0002
+                    +974 1234 5678
                   </a>
                 </div>
               </div>

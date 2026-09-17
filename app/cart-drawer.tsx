@@ -39,7 +39,7 @@ export default function CartDrawer({ scrolled, isOpen, onClose }: { scrolled?: b
 
     const promoText = appliedPromo ? "\nPromo: " + appliedPromo.code : "";
     const message = "New Order from Happy Truffles Cafe Website:\n\n" + orderText + "\n\nSubtotal: QAR " + cartTotal.toFixed(2) + promoText + "\nTotal: QAR " + finalTotal.toFixed(2);
-    window.open("https://wa.me/97431590002?text=" + encodeURIComponent(message), "_blank");
+    window.open("https://wa.me/97412345678?text=" + encodeURIComponent(message), "_blank");
   };
 
   return (

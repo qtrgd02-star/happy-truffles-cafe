@@ -50,7 +50,7 @@ export async function sendOrderConfirmationEmail(order: any): Promise<boolean> {
       </div>
       <p style="color: #888; font-size: 12px; margin-top: 20px;">
         Happy Truffles Cafe | Gold Plaza, Abu Hamour, Doha, Qatar<br />
-        Tel: +974 3159 0002
+        Tel: +974 1234 5678
       </p>
     </div>
   `;
@@ -83,7 +83,7 @@ export async function sendOrderStatusUpdateEmail(order: any, status: string): Pr
       </div>
       <p style="color: #888; font-size: 12px; margin-top: 20px;">
         Happy Truffles Cafe | Gold Plaza, Abu Hamour, Doha, Qatar<br />
-        Tel: +974 3159 0002
+        Tel: +974 1234 5678
       </p>
     </div>
   `;
@@ -111,7 +111,7 @@ export async function sendReservationConfirmationEmail(reservation: any): Promis
       </div>
       <p style="color: #888; font-size: 12px; margin-top: 20px;">
         Happy Truffles Cafe | Gold Plaza, Abu Hamour, Doha, Qatar<br />
-        Tel: +974 3159 0002
+        Tel: +974 1234 5678
       </p>
     </div>
   `;
