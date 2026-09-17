@@ -14,7 +14,7 @@ const WhatsAppContext = createContext<WhatsAppContextType | undefined>(undefined
 const AUTO_RESPONSES: Record<string, string> = {
   "menu": "Our menu includes truffles, coffee, and combos! Visit https://happytruffles.qa/menu for full menu.",
   "hours": "We are open daily 8:00 AM - 11:30 PM (1:00 AM on weekends).",
-  "location": "Gold Plaza, Abu Hamour, Doha, Qatar.",
+  "location": "C.T Plaza DA, South, CTA.",
   "order": "You can order online at https://happytruffles.qa or call +974 XXXX XXXX",
   "delivery": "Delivery available across Doha. Free delivery on orders above QAR 100.",
   "default": "Thank you for contacting Happy Truffles Cafe! How can we help you today?",

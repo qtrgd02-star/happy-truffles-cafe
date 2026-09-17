@@ -49,7 +49,7 @@ export async function sendOrderConfirmationEmail(order: any): Promise<boolean> {
         <p style="font-size: 18px; font-weight: bold;">Total: QAR ${order.total.toFixed(2)}</p>
       </div>
       <p style="color: #888; font-size: 12px; margin-top: 20px;">
-        Happy Truffles Cafe | Gold Plaza, Abu Hamour, Doha, Qatar<br />
+        Happy Truffles Cafe | C.T Plaza DA, South, CTA<br />
         Tel: +974 1234 5678
       </p>
     </div>
@@ -82,7 +82,7 @@ export async function sendOrderStatusUpdateEmail(order: any, status: string): Pr
         <p style="font-size: 16px; font-weight: bold; color: #5D4037;">${statusMessages[status] || status}</p>
       </div>
       <p style="color: #888; font-size: 12px; margin-top: 20px;">
-        Happy Truffles Cafe | Gold Plaza, Abu Hamour, Doha, Qatar<br />
+        Happy Truffles Cafe | C.T Plaza DA, South, CTA<br />
         Tel: +974 1234 5678
       </p>
     </div>
@@ -110,7 +110,7 @@ export async function sendReservationConfirmationEmail(reservation: any): Promis
         <p><strong>Guests:</strong> ${reservation.guests}</p>
       </div>
       <p style="color: #888; font-size: 12px; margin-top: 20px;">
-        Happy Truffles Cafe | Gold Plaza, Abu Hamour, Doha, Qatar<br />
+        Happy Truffles Cafe | C.T Plaza DA, South, CTA<br />
         Tel: +974 1234 5678
       </p>
     </div>

@@ -45,8 +45,8 @@ export const metadata: Metadata = {
     default: "Happy Truffles Cafe | Artisan Chocolate & Coffee | Doha, Qatar",
     template: "%s | Happy Truffles Cafe"
   },
-  description: "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in Gold Plaza, Abu Hamour, Doha, Qatar. Order online for delivery or dine-in.",
-  keywords: ["happy truffles cafe", "chocolate truffles", "specialty coffee", "matcha", "doha cafe", "abu hamour", "gold plaza", "qatar restaurant", "cafe doha", "artisan chocolate", "cafe near me"],
+  description: "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in C.T Plaza DA, South, CTA. Order online for delivery or dine-in.",
+  keywords: ["happy truffles cafe", "chocolate truffles", "specialty coffee", "matcha", "ct plaza", "south cta", "qatar restaurant", "cafe doha", "artisan chocolate", "cafe near me"],
   authors: [{ name: "Happy Truffles Cafe" }],
   creator: "Happy Truffles Cafe",
   publisher: "Happy Truffles Cafe",

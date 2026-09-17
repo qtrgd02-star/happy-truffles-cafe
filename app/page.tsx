@@ -724,8 +724,8 @@ export default function Home() {
             className="text-vanilla/90 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             Experience the perfect blend of artisan chocolate truffles,
-            specialty coffee, matcha, and cozy vibes at Gold Plaza, Abu
-            Hamour.
+             specialty coffee, matcha, and cozy vibes at C.T Plaza DA,
+             South, CTA.
           </motion.p>
 
           <motion.div
@@ -793,7 +793,7 @@ export default function Home() {
             <div className="w-20 h-1.5 bg-truffle rounded-full" />
             <p className="text-chocolate/80 text-lg leading-relaxed dark:text-vanilla/80">
               Welcome to Happy Truffles Cafe — a cozy retreat in the heart of
-              Gold Plaza, Abu Hamour. We believe great food and warm company
+              C.T Plaza DA, South, CTA. We believe great food and warm company
               make the perfect recipe for happiness.
             </p>
             <p className="text-chocolate/80 text-lg leading-relaxed dark:text-vanilla/80">
@@ -1269,7 +1269,7 @@ export default function Home() {
                 <div>
                   <h3 className="font-semibold text-chocolate dark:text-vanilla mb-1">Location</h3>
                   <p className="text-chocolate/70">
-                    Gold Plaza, Abu Hamour, Doha, Qatar
+                    C.T Plaza DA, South, CTA
                   </p>
                 </div>
               </div>
@@ -1451,7 +1451,7 @@ export default function Home() {
               Happy Truffles
             </h3>
             <p className="text-vanilla/70 max-w-md leading-relaxed">
-              A cozy cafe in Gold Plaza, Abu Hamour, serving artisan truffles,
+              A cozy cafe in C.T Plaza DA, South, CTA, serving artisan truffles,
               specialty coffee, matcha, and warm vibes since day one.
             </p>
           </div>
