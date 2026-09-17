@@ -89,8 +89,19 @@ export function OrderHistoryProvider({ children }: { children: ReactNode }) {
     const unsubscribe = onSnapshot(
       q,
       (snapshot) => {
-        const firestoreOrders = snapshot.docs.map((docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() } as Order));
-        setOrders(firestoreOrders);
+        const allOrders = snapshot.docs.map((docSnapshot) => ({ id: docSnapshot.id, ...docSnapshot.data() } as Order));
+        const savedUser = localStorage.getItem("user");
+        let currentUserEmail: string | null = null;
+        if (savedUser) {
+          try {
+            const userData = JSON.parse(savedUser);
+            currentUserEmail = userData?.email || null;
+          } catch {
+            currentUserEmail = null;
+          }
+        }
+        const filteredOrders = currentUserEmail ? allOrders.filter((order) => order.customer?.email === currentUserEmail) : [];
+        setOrders(filteredOrders);
         setUseFirestore(true);
       },
       (error) => {

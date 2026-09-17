@@ -50,6 +50,7 @@ export default function CartDrawer({ scrolled, isOpen, onClose }: { scrolled?: b
           scrolled ? "text-chocolate/80 hover:text-truffle" : "text-white/80 hover:text-white"
         }`}
         aria-label="Open cart"
+        style={{ position: 'relative', zIndex: 50 }}
       >
         <ShoppingCart size={20} />
         {cartCount > 0 && (
