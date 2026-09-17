@@ -5,19 +5,22 @@ import { useAuth } from "@/app/auth-context";
 import { useToast } from "@/app/toast-context";
 import { motion } from "framer-motion";
 import { Mail, Lock, User } from "lucide-react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function RegisterPage() {
   const { register } = useAuth();
   const { showToast } = useToast();
+  const router = useRouter();
   const [form, setForm] = useState({ name: "", email: "", password: "" });
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = register(form.name, form.email, form.password);
+    const success = await register(form.name, form.email, form.password);
     if (success) {
       showToast("Account created successfully!");
+      router.push("/");
     } else {
       setError("Email already registered");
     }

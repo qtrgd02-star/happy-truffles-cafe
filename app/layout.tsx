@@ -99,6 +99,7 @@ export const metadata: Metadata = {
 };
 
 import { ServiceWorkerRegistrar } from "./components/service-worker-registrar";
+import { FirebaseMessaging } from "./components/firebase-messaging";
 import { SubscriptionProvider } from "./subscription-context";
 import { CustomizationProvider } from "./customization-context";
 import { CorporateProvider } from "./corporate-context";
@@ -139,8 +140,9 @@ export default function RootLayout({
                                                     <CateringProvider>
                                                       <SeasonalMenuProvider>
                                                        <StaffScheduleProvider>
-                                                         <ServiceWorkerRegistrar />
-                                                         <SubscriptionProvider>
+                                                          <ServiceWorkerRegistrar />
+                                                          <FirebaseMessaging />
+                                                          <SubscriptionProvider>
                                                            <CustomizationProvider>
                                                              <CorporateProvider>
                                                                <WhatsAppProvider>

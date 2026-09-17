@@ -15,9 +15,9 @@ export default function LoginPage() {
   const [form, setForm] = useState({ email: "", password: "" });
   const [error, setError] = useState("");
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(form.email, form.password);
+    const success = await login(form.email, form.password);
     if (success) {
       showToast("Welcome back!");
       router.push("/admin");
