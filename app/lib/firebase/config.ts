@@ -14,11 +14,25 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+const hasRequiredConfig = !!(
+  firebaseConfig.apiKey &&
+  firebaseConfig.authDomain &&
+  firebaseConfig.projectId &&
+  firebaseConfig.appId
+);
 
-export const auth = getAuth(app);
-export const db = getFirestore(app);
-export const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
-export const messaging = typeof window !== "undefined" ? getMessaging(app) : null;
+let app;
+if (hasRequiredConfig) {
+  try {
+    app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+  } catch (e) {
+    console.warn("Firebase initialization failed:", e);
+  }
+}
+
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;
+export const analytics = typeof window !== "undefined" && app ? getAnalytics(app) : null;
+export const messaging = typeof window !== "undefined" && app ? getMessaging(app) : null;
 
 export default app;
