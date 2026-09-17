@@ -1,6 +1,4 @@
-import { MetadataRoute } from 'next';
-
-export const metadata: MetadataRoute = {
+export const metadata = {
   robots: {
     index: true,
     follow: true,
@@ -14,7 +12,7 @@ export const metadata: MetadataRoute = {
   },
 };
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default function sitemap() {
   const baseUrl = 'https://happy-truffles-cafe.vercel.app';
   
   return [

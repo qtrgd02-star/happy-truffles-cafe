@@ -1,6 +1,4 @@
-import { MetadataRoute } from 'next';
-
-export const metadata: MetadataRoute = {
+export const metadata = {
   robots: {
     index: true,
     follow: true,
