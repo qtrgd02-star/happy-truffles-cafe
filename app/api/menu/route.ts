@@ -3,6 +3,9 @@ import { db } from "@/app/lib/firebase/config";
 import { collection, getDocs } from "firebase/firestore";
 
 export async function GET() {
+  if (!db) {
+    return NextResponse.json({ error: "Firebase is not configured" }, { status: 500 });
+  }
   try {
     const snapshot = await getDocs(collection(db, "menuItems"));
     const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));

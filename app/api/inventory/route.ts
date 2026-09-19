@@ -29,6 +29,9 @@ function writeLocalInventory(items: any[]) {
 }
 
 export async function GET() {
+  if (!db) {
+    return NextResponse.json({ error: "Firebase is not configured" }, { status: 500 });
+  }
   try {
     const snapshot = await getDocs(collection(db, "inventory"));
     const items = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -42,6 +45,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!db) {
+    return NextResponse.json({ error: "Firebase is not configured" }, { status: 500 });
+  }
   try {
     const body = await request.json();
 

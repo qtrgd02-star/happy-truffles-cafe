@@ -28,6 +28,9 @@ function writeLocalStaff(items: any[]) {
 }
 
 export async function GET() {
+  if (!db) {
+    return NextResponse.json(readLocalStaff());
+  }
   try {
     const snapshot = await getDocs(firestoreQuery(collection(db, "staff"), orderBy("createdAt", "desc")));
     const staff = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));

@@ -6,6 +6,9 @@ const SETTINGS_COLLECTION = "settings";
 const SETTINGS_DOC = "restaurant";
 
 export async function GET() {
+  if (!db) {
+    return NextResponse.json({ error: "Firebase is not configured" }, { status: 500 });
+  }
   try {
     const settingsRef = doc(db, SETTINGS_COLLECTION, SETTINGS_DOC);
     const snapshot = await getDoc(settingsRef);
@@ -27,6 +30,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  if (!db) {
+    return NextResponse.json({ error: "Firebase is not configured" }, { status: 500 });
+  }
   try {
     const body = await request.json();
     const settingsRef = doc(db, SETTINGS_COLLECTION, SETTINGS_DOC);

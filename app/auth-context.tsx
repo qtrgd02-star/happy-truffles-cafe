@@ -21,6 +21,7 @@ import {
   where
 } from "firebase/firestore";
 import { auth, db } from "@/app/lib/firebase/config";
+import type { Auth } from "firebase/auth";
 
 export type UserRole = "customer" | "staff" | "admin";
 
@@ -51,17 +52,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!auth) {
+      setLoading(false);
+      return;
+    }
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
-        const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
-        if (userDoc.exists()) {
-          const userData = userDoc.data();
-          setUser({
-            email: firebaseUser.email || "",
-            name: userData.name || "",
-            role: userData.role || "customer",
-            uid: firebaseUser.uid,
-          });
+        if (db) {
+          const userDoc = await getDoc(doc(db, "users", firebaseUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            setUser({
+              email: firebaseUser.email || "",
+              name: userData.name || "",
+              role: userData.role || "customer",
+              uid: firebaseUser.uid,
+            });
+          } else {
+            setUser({
+              email: firebaseUser.email || "",
+              name: firebaseUser.email?.split("@")[0] || "User",
+              role: "customer",
+              uid: firebaseUser.uid,
+            });
+          }
         } else {
           setUser({
             email: firebaseUser.email || "",
@@ -80,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const ensureDefaultAdmin = async () => {
+    if (!db) return;
     const usersRef = collection(db, "users");
     const q = query(usersRef, where("email", "==", "admin@happytruffles.qa"));
     const snapshot = await getDocs(q);
@@ -100,6 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
+      if (!auth) return false;
       const result = await signInWithEmailAndPassword(auth, email, password);
       return true;
     } catch (error) {
@@ -110,6 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (name: string, email: string, password: string, role: UserRole = "customer"): Promise<boolean> => {
     try {
+      if (!auth || !db) return false;
       const result = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, "users", result.user.uid), {
         name,
@@ -126,6 +143,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
+      if (!auth) return;
       await signOut(auth);
     } catch (error) {
       console.error("Logout failed:", error);
@@ -141,6 +159,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const updateAccountRole = async (email: string, role: UserRole): Promise<boolean> => {
     try {
+      if (!db) return false;
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("email", "==", email));
       const snapshot = await getDocs(q);
@@ -162,6 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = async (email: string): Promise<boolean> => {
     try {
+      if (!db) return false;
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("email", "==", email));
       const snapshot = await getDocs(q);
@@ -183,6 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const getAccountsList = async (): Promise<Array<{ name: string; email: string; role: UserRole }>> => {
     try {
+      if (!db) return [];
       const usersRef = collection(db, "users");
       const q = query(usersRef, orderBy("email"));
       const snapshot = await getDocs(q);
