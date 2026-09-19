@@ -16,14 +16,18 @@ interface AnalyticsData {
 export default function AdminAnalyticsPage() {
   const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
   const [timeRange, setTimeRange] = useState("7d");
+  const [error, setError] = useState<string | null>(null);
 
   const fetchAnalytics = useCallback(async () => {
+    setError(null);
     try {
       const res = await fetch(`/api/admin/analytics?range=${timeRange}`);
+      if (!res.ok) throw new Error("Failed to load analytics");
       const data = await res.json();
       setAnalytics(data);
     } catch (e) {
       console.error("Failed to fetch analytics:", e);
+      setError("Failed to load analytics. Please try again.");
     }
   }, [timeRange]);
 
@@ -32,6 +36,16 @@ export default function AdminAnalyticsPage() {
   }, [fetchAnalytics]);
 
   if (!analytics) {
+    if (error) {
+      return (
+        <div className="flex flex-col items-center justify-center h-screen gap-4">
+          <p className="text-red-600">{error}</p>
+          <button onClick={fetchAnalytics} className="bg-truffle text-white px-4 py-2 rounded-full font-semibold hover:bg-chocolate transition-colors">
+            Retry
+          </button>
+        </div>
+      );
+    }
     return <div className="flex items-center justify-center h-screen">Loading...</div>;
   }
 

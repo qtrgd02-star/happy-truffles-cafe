@@ -9,19 +9,26 @@ export default function CorporatePage() {
   const { accounts, addAccount, placeBulkOrder } = useCorporate();
   const [form, setForm] = useState({ companyName: "", contactName: "", email: "", phone: "", address: "", taxNumber: "" });
   const [bulkOrder, setBulkOrder] = useState({ accountId: "", items: "", total: "" });
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addAccount({ ...form, creditLimit: 5000, balance: 0 });
     setForm({ companyName: "", contactName: "", email: "", phone: "", address: "", taxNumber: "" });
-    alert("Corporate account created!");
+    setMessage({ type: "success", text: "Corporate account created!" });
+    setTimeout(() => setMessage(null), 3000);
   };
 
   const handleBulkOrder = (e: React.FormEvent) => {
     e.preventDefault();
-    placeBulkOrder(bulkOrder.accountId, [], Number(bulkOrder.total));
+    const result = placeBulkOrder(bulkOrder.accountId, [], Number(bulkOrder.total));
     setBulkOrder({ accountId: "", items: "", total: "" });
-    alert("Bulk order placed!");
+    if (result.success) {
+      setMessage({ type: "success", text: "Bulk order placed!" });
+    } else {
+      setMessage({ type: "error", text: result.error || "Failed to place bulk order" });
+    }
+    setTimeout(() => setMessage(null), 3000);
   };
 
   return (
@@ -30,6 +37,11 @@ export default function CorporatePage() {
         <div className="text-center mb-12">
           <h1 className="font-playfair text-4xl md:text-5xl font-bold text-chocolate mb-4">Corporate Accounts</h1>
           <p className="text-chocolate/70 text-lg">Bulk orders for offices and events with invoicing.</p>
+          {message && (
+            <div className={`mt-4 px-4 py-3 rounded-lg ${message.type === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-700"}`}>
+              {message.text}
+            </div>
+          )}
         </div>
 
         <div className="grid md:grid-cols-2 gap-8">

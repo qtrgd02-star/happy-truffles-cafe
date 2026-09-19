@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { QrCode, Plus, Trash2, Download, Printer } from "lucide-react";
+import Image from "next/image";
 
 interface Table {
   id: string;
@@ -87,7 +88,7 @@ export default function TablesQRPage() {
                   <Trash2 size={18} />
                 </button>
               </div>
-              <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(table.qrUrl)}`} alt={`QR for ${table.label}`} className="mx-auto mb-4" />
+              <Image src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(table.qrUrl)}`} alt={`QR for ${table.label}`} width={200} height={200} className="mx-auto mb-4" unoptimized />
               <div className="flex gap-2">
                 <button onClick={() => printQR(table)} className="flex-1 bg-truffle/10 text-truffle py-2 rounded-lg text-sm font-semibold hover:bg-truffle/20 transition-colors flex items-center justify-center gap-1">
                   <Printer size={14} />

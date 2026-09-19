@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTheme } from "@/app/theme-context";
 import { useAuth } from "@/app/auth-context";
 import { useLanguage } from "@/app/language-context";
@@ -189,6 +190,7 @@ function SearchAutocomplete({
 }
 
 export default function Home() {
+  const router = useRouter();
   const { wishlistCount } = useWishlist();
   const { recentlyViewed, addToRecentlyViewed } = useRecentlyViewed();
   const { theme, toggleTheme } = useTheme();
@@ -317,6 +319,7 @@ export default function Home() {
     }
     showToast(`Added ${qty} x ${item.title} to cart`);
     setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
+    router.push("/cart");
   };
 
   const updateItemQuantity = (itemId: number, delta: number) => {
@@ -408,7 +411,7 @@ export default function Home() {
                   (item) => (
                     <a
                       key={item}
-                      href={["Orders", "Reservations", "QR", "Gift Cards", "Table Order", "Kitchen"].includes(item) ? `/${item.toLowerCase()}` : `#${item.toLowerCase()}`}
+                      href={["Orders", "Reservations", "QR", "Gift Cards", "Table Order", "Kitchen", "Gallery"].includes(item) ? `/${item.toLowerCase()}` : `#${item.toLowerCase()}`}
                       className="text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors font-medium text-sm tracking-wide"
                     >
                       {item}
@@ -1091,6 +1094,66 @@ export default function Home() {
         </section>
       )}
 
+      {/* Gallery Section */}
+      <section id="gallery" className="py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold text-chocolate dark:text-vanilla mb-4">
+              Our Gallery
+            </h2>
+            <div className="w-20 h-1.5 bg-truffle rounded-full mx-auto mb-4" />
+            <p className="text-chocolate/60 max-w-2xl mx-auto">
+              Take a peek inside Happy Truffles Cafe. From our handcrafted truffles to our cozy interior, every corner is designed for your perfect moment.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[
+              { src: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=400&height=400", caption: "Heart-Shaped Truffles" },
+              { src: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=400&height=400", caption: "Cafe Interior" },
+              { src: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=400&height=400", caption: "Coffee Art" },
+              { src: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=400&height=400", caption: "Outdoor Seating" },
+            ].map((image, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1 }}
+                className="group relative aspect-square rounded-2xl overflow-hidden cursor-pointer bg-white shadow-sm"
+              >
+                <Image
+                  src={image.src}
+                  alt={image.caption}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <p className="text-white font-medium text-sm">{image.caption}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-8">
+            <Link
+              href="/gallery"
+              className="inline-block bg-truffle text-white px-8 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors"
+            >
+              View Full Gallery
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Reviews / Testimonials Section */}
        <section
          id="reviews"
@@ -1242,6 +1305,89 @@ export default function Home() {
                 </p>
               )}
             </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Blog Preview Section */}
+      <section id="blog" className="py-24 px-4 bg-vanilla/30 dark:bg-neutral-800/50">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center mb-16"
+          >
+            <h2 className="font-playfair text-4xl md:text-5xl font-bold text-chocolate dark:text-vanilla mb-4">
+              Latest Updates
+            </h2>
+            <div className="w-20 h-1.5 bg-truffle rounded-full mx-auto mb-4" />
+            <p className="text-chocolate/60 max-w-2xl mx-auto">
+              Stay in the loop with our latest news, menu additions, and special offers.
+            </p>
+          </motion.div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                title: "Valentine's Day Special",
+                excerpt: "Heart-shaped truffles are back for a limited time.",
+                category: "Menu",
+                date: "Feb 5, 2026",
+                image: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=600&height=400",
+              },
+              {
+                title: "Summer Festival 2026",
+                excerpt: "Live music, special menu, and giveaways coming this July.",
+                category: "Events",
+                date: "Jun 28, 2026",
+                image: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=600&height=400",
+              },
+              {
+                title: "New Matcha Latte",
+                excerpt: "Premium Japanese matcha, now available hot or iced.",
+                category: "Menu",
+                date: "Jun 15, 2026",
+                image: "https://images.deliveryhero.io/image/global-menu-service/TB_QA/vendor/793686/product/ab9f22c5-29b3-4c4f-823c-26d8b99db369.jpg?width=600&height=400",
+              },
+            ].map((post, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-white dark:bg-neutral-800 rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+              >
+                <Link href="/blog">
+                  <div className="relative aspect-video">
+                    <Image src={post.image} alt={post.title} fill className="object-cover" />
+                    <div className="absolute top-4 left-4">
+                      <span className="bg-truffle text-white text-xs font-medium px-3 py-1 rounded-full">
+                        {post.category}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <h3 className="font-playfair text-xl font-bold text-chocolate dark:text-vanilla mb-2">
+                      {post.title}
+                    </h3>
+                    <p className="text-chocolate/70 text-sm mb-4">{post.excerpt}</p>
+                    <p className="text-chocolate/50 text-xs">{post.date}</p>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <Link
+              href="/blog"
+              className="inline-block bg-truffle text-white px-8 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors"
+            >
+              Read All Articles
+            </Link>
           </div>
         </div>
       </section>

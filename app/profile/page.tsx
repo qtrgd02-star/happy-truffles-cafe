@@ -4,9 +4,11 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { User, MapPin, Heart, Package, Plus, Trash2 } from "lucide-react";
 import { useCustomer } from "@/app/customer-context";
+import { useToast } from "@/app/toast-context";
 
 export default function CustomerProfilePage() {
   const { profile, createProfile, updateProfile, addAddress, removeAddress, addFavoriteItem, removeFavoriteItem, isFavorite, loadProfile } = useCustomer();
+  const { showToast } = useToast();
   const [phone, setPhone] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
@@ -25,7 +27,7 @@ export default function CustomerProfilePage() {
     if (!phone.trim()) return;
     const found = loadProfile(phone.trim());
     if (!found) {
-      alert("No profile found. Please create one.");
+      showToast("No profile found. Please create one.");
     }
   };
 

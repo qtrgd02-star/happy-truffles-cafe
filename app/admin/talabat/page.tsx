@@ -17,14 +17,24 @@ interface TalabatOrder {
 export default function TalabatAdminPage() {
   const [orders, setOrders] = useState<TalabatOrder[]>([]);
   const [importing, setImporting] = useState(false);
-  const [syncText, setSyncText] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
-    fetch("/api/talabat").then((r) => r.json()).then(setOrders).catch(console.error);
+    setLoading(true);
+    setError(null);
+    fetch("/api/talabat")
+      .then((r) => r.json())
+      .then(setOrders)
+      .catch(() => setError("Failed to load Talabat orders."))
+      .finally(() => setLoading(false));
   }, []);
 
   const handleImport = async () => {
     setImporting(true);
+    setError(null);
+    setMessage(null);
     try {
       const res = await fetch("/api/talabat", {
         method: "POST",
@@ -33,22 +43,36 @@ export default function TalabatAdminPage() {
       });
       const data = await res.json();
       if (data.success) {
-        fetch("/api/talabat").then((r) => r.json()).then(setOrders);
-        alert(`Imported ${data.imported} orders`);
+        const refreshed = await fetch("/api/talabat").then((r) => r.json());
+        setOrders(refreshed);
+        setMessage({ type: "success", text: `Imported ${data.imported} orders` });
+      } else {
+        setError(data.error || "Import failed.");
       }
-    } catch (e) { console.error(e); }
+    } catch (e) {
+      setError("Import failed. Please try again.");
+    }
     setImporting(false);
   };
 
   const handleSync = async () => {
+    setError(null);
+    setMessage(null);
     try {
-      await fetch("/api/talabat", {
+      const res = await fetch("/api/talabat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "sync", orders }),
       });
-      alert("Synced successfully");
-    } catch (e) { console.error(e); }
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setError(data.error || "Sync failed.");
+        return;
+      }
+      setMessage({ type: "success", text: "Synced successfully" });
+    } catch (e) {
+      setError("Sync failed. Please try again.");
+    }
   };
 
   const handleClear = async () => {
@@ -85,42 +109,51 @@ export default function TalabatAdminPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-vanilla/30">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Order ID</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Customer</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Total</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Source</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {orders.map((order) => (
-                  <tr key={order.id} className="hover:bg-vanilla/10">
-                    <td className="px-6 py-4 text-sm font-medium text-chocolate">{order.id}</td>
-                    <td className="px-6 py-4 text-sm text-chocolate/80">{order.customer.name} | {order.customer.phone}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-truffle">QAR {order.total.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-sm text-chocolate/80">{order.status}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                        <ExternalLink size={12} />
-                        {order.source}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {orders.length === 0 && (
+          {(error || message) && (
+            <div className={`px-6 py-3 text-sm ${error ? "bg-red-50 border-b border-red-200 text-red-700" : "bg-green-50 border-b border-green-200 text-green-700"}`}>
+              {error || message?.text}
+            </div>
+          )}
+          {loading ? (
+            <div className="p-12 text-center text-chocolate/60">Loading orders...</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-vanilla/30">
                   <tr>
-                    <td colSpan={5} className="px-6 py-12 text-center text-chocolate/60">
-                      No external orders imported yet. Click Import Demo to test.
-                    </td>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Order ID</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Customer</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Total</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-chocolate/60 uppercase tracking-wider">Source</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {orders.map((order) => (
+                    <tr key={order.id} className="hover:bg-vanilla/10">
+                      <td className="px-6 py-4 text-sm font-medium text-chocolate">{order.id}</td>
+                      <td className="px-6 py-4 text-sm text-chocolate/80">{order.customer.name} | {order.customer.phone}</td>
+                      <td className="px-6 py-4 text-sm font-medium text-truffle">QAR {order.total.toFixed(2)}</td>
+                      <td className="px-6 py-4 text-sm text-chocolate/80">{order.status}</td>
+                      <td className="px-6 py-4 text-sm">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                          <ExternalLink size={12} />
+                          {order.source}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                  {orders.length === 0 && (
+                    <tr>
+                      <td colSpan={5} className="px-6 py-12 text-center text-chocolate/60">
+                        No external orders imported yet. Click Import Demo to test.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>

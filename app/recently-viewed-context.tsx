@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import type { MenuItem } from "./menu-data";
 import { useUser } from "@/app/user-context";
 
@@ -25,7 +25,7 @@ export function RecentlyViewedProvider({ children }: { children: ReactNode }) {
   const { getUserKey } = useUser();
   const [recentlyViewed, setRecentlyViewed] = useState<RecentlyViewedItem[]>([]);
 
-  const getRecentlyViewedKey = () => getUserKey("recentlyViewed");
+  const getRecentlyViewedKey = useCallback(() => getUserKey("recentlyViewed"), [getUserKey]);
 
   useEffect(() => {
     const saved = localStorage.getItem(getRecentlyViewedKey());

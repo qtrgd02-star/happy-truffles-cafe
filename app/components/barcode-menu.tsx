@@ -60,10 +60,13 @@ export default function BarcodeMenu() {
           <div className="bg-white rounded-2xl p-6 shadow-lg">
             <h3 className="font-playfair text-xl font-bold text-chocolate mb-4">QR Code</h3>
             <div className="flex flex-col items-center">
-              <img
+              <Image
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(menuUrl)}`}
                 alt="Menu QR Code"
+                width={250}
+                height={250}
                 className="mb-4"
+                unoptimized
               />
               <p className="text-sm text-chocolate/60 text-center">
                 Scan this QR code to access the full menu on your phone

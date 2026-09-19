@@ -97,11 +97,6 @@ export default function AdminPromosPage() {
             <h1 className="font-playfair text-4xl font-bold text-chocolate">Promo Codes</h1>
             <p className="text-chocolate/60 mt-1">Create and manage discount codes</p>
           </div>
-          {message && (
-            <div className={`px-4 py-2 rounded-lg text-sm ${message.type === "success" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
-              {message.text}
-            </div>
-          )}
           <button
             onClick={() => {
               setEditingPromo(null);
@@ -124,6 +119,12 @@ export default function AdminPromosPage() {
             Add Promo
           </button>
         </div>
+
+        {message && (
+          <div className={`px-4 py-3 rounded-lg mb-6 ${message.type === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-700"}`}>
+            {message.text}
+          </div>
+        )}
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
           {promos.length === 0 ? (

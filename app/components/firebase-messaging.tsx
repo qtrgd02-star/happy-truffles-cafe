@@ -3,8 +3,11 @@
 import { useEffect } from "react";
 import { messaging } from "@/app/lib/firebase/config";
 import { getToken, onMessage } from "firebase/messaging";
+import { useToast } from "@/app/toast-context";
 
 export function FirebaseMessaging() {
+  const { showToast } = useToast();
+
   useEffect(() => {
     if (!messaging) return;
 
@@ -29,14 +32,14 @@ export function FirebaseMessaging() {
     const unsubscribe = onMessage(fcm, (payload) => {
       console.log("Received foreground message:", payload);
       if (payload.notification) {
-        alert(`${payload.notification.title}: ${payload.notification.body}`);
+        showToast(`${payload.notification.title}: ${payload.notification.body}`);
       }
     });
 
     return () => {
       if (unsubscribe) unsubscribe();
     };
-  }, []);
+  }, [showToast]);
 
   return null;
 }

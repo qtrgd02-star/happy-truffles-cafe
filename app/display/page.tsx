@@ -6,6 +6,7 @@ import { useTables } from "@/app/table-context";
 import { motion } from "framer-motion";
 import { Clock, ChefHat, CheckCircle2 } from "lucide-react";
 import { menuItems } from "@/app/menu-data";
+import Image from "next/image";
 
 const statusConfig = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -59,7 +60,7 @@ export default function OrderStatusBoard() {
             {menuItems.slice(0, 12).map((item) => (
               <div key={item.id} className="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
                 <div className="aspect-square bg-vanilla/40">
-                  <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                  <Image src={item.image} alt={item.title} width={400} height={400} className="w-full h-full object-cover" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-playfair text-lg font-bold text-chocolate">{item.title}</h3>

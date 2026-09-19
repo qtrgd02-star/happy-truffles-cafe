@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useBackupService } from "@/app/lib/backup-service";
 import { motion } from "framer-motion";
 import { Database, CheckCircle, AlertCircle, Clock } from "lucide-react";
@@ -9,7 +9,14 @@ export default function AdminBackupsPage() {
   const { createBackup, getBackups } = useBackupService();
   const [backups, setBackups] = useState(getBackups());
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [lastBackup, setLastBackup] = useState<string | null>(null);
+  const [restoreMessage, setRestoreMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  useEffect(() => {
+    setInitialLoading(true);
+    setTimeout(() => setInitialLoading(false), 600);
+  }, []);
 
   const handleBackup = async () => {
     setLoading(true);
@@ -20,12 +27,22 @@ export default function AdminBackupsPage() {
   };
 
   const handleRestore = async (backupId: string) => {
-    await fetch("/api/backups", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "restore", backupId }),
-    });
-    alert("Restore initiated for backup " + backupId);
+    setRestoreMessage(null);
+    try {
+      const res = await fetch("/api/backups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "restore", backupId }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setRestoreMessage({ type: "error", text: data.error || "Restore failed" });
+        return;
+      }
+      setRestoreMessage({ type: "success", text: "Restore initiated for backup " + backupId });
+    } catch {
+      setRestoreMessage({ type: "error", text: "Restore failed. Please try again." });
+    }
   };
 
   function getStatusColor(status: string) {
@@ -55,6 +72,11 @@ export default function AdminBackupsPage() {
               {loading ? "Backing up..." : "Backup Now"}
             </button>
           </div>
+          {restoreMessage && (
+            <div className={`px-4 py-3 rounded-lg mb-6 ${restoreMessage.type === "success" ? "bg-green-50 border border-green-200 text-green-700" : "bg-red-50 border border-red-200 text-red-700"}`}>
+              {restoreMessage.text}
+            </div>
+          )}
           {lastBackup && (
             <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6 flex items-center gap-2">
               <CheckCircle className="text-green-600" size={20} />
@@ -63,7 +85,17 @@ export default function AdminBackupsPage() {
           )}
           <h3 className="font-playfair text-xl font-bold text-chocolate mb-4">Backup History</h3>
           <div className="space-y-3">
-            {backups.length === 0 ? (
+            {initialLoading ? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="bg-vanilla/20 rounded-xl p-4 flex items-center gap-3 animate-pulse">
+                  <div className="w-10 h-10 rounded-full bg-vanilla/40" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-4 bg-vanilla/40 rounded w-1/3" />
+                    <div className="h-3 bg-vanilla/30 rounded w-1/2" />
+                  </div>
+                </div>
+              ))
+            ) : backups.length === 0 ? (
               <p className="text-chocolate/60 text-center py-8">No backups yet</p>
             ) : (
               backups.map((backup: any) => (

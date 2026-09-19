@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useOrderHistory, type Order, type OrderStatus } from "@/app/order-history-context";
 import { useShifts } from "@/app/shift-context";
@@ -15,6 +15,7 @@ export default function AdminReportsPage() {
   const { orders } = useOrderHistory();
   const { shifts, getShiftSummary } = useShifts();
   const [period, setPeriod] = useState<ReportPeriod>("today");
+  const [loading, setLoading] = useState(true);
 
   const filteredOrders = useMemo(() => {
     const now = new Date();
@@ -88,6 +89,59 @@ export default function AdminReportsPage() {
       };
     });
   }, [shifts, getShiftSummary]);
+
+  useEffect(() => {
+    setLoading(false);
+  }, [orders, shifts]);
+
+  if (!isAuthenticated || !hasRole("admin")) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-vanilla/30">
+        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md text-center">
+          <h1 className="font-playfair text-3xl font-bold text-chocolate mb-4">Access Denied</h1>
+          <p className="text-chocolate/60 mb-6">You need admin privileges to access reports.</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-vanilla/30 py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="h-10 bg-vanilla/30 rounded animate-pulse w-48 mb-8" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl shadow-sm border p-6">
+                <div className="h-4 bg-vanilla/30 rounded animate-pulse w-1/2 mb-2" />
+                <div className="h-8 bg-vanilla/30 rounded animate-pulse w-1/3" />
+              </div>
+            ))}
+          </div>
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {Array.from({ length: 2 }).map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl shadow-sm border p-6">
+                <div className="h-6 bg-vanilla/30 rounded animate-pulse w-1/3 mb-4" />
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, j) => (
+                    <div key={j} className="h-16 bg-vanilla/20 rounded-lg animate-pulse" />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white rounded-2xl shadow-sm border p-6">
+            <div className="h-6 bg-vanilla/30 rounded animate-pulse w-1/4 mb-4" />
+            <div className="space-y-3">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-20 bg-vanilla/20 rounded-lg animate-pulse" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated || !hasRole("admin")) {
     return (

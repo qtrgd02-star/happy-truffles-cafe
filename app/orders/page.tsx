@@ -8,8 +8,10 @@ import { motion } from "framer-motion";
 import { Package, Trash2, ChevronRight, ShoppingBag, RefreshCw, Star, XCircle } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function OrdersPage() {
+  const router = useRouter();
   const { orders, updateOrderStatus, clearHistory } = useOrderHistory();
   const { addToCart } = useCart();
   const { showToast } = useToast();
@@ -27,6 +29,7 @@ export default function OrdersPage() {
     showToast("Items added to cart");
     setReorderMessage(`Reorder from ${order.id} added to cart`);
     setTimeout(() => setReorderMessage(null), 3000);
+    router.push("/cart");
   };
 
   const handleCancelOrder = (orderId: string) => {
@@ -103,13 +106,12 @@ export default function OrdersPage() {
             </button>
           </div>
         </div>
-        <div className="space-y-6">
-          {orders.map((order, index) => (
+        <div className="space-y-6 max-h-[calc(100vh-200px)] overflow-y-auto pr-2">
+          {orders.map((order) => (
             <motion.div
               key={order.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
               className="bg-white rounded-3xl shadow-xl overflow-hidden"
             >
               <div className="p-6 border-b border-chocolate/10 flex items-center justify-between">

@@ -4,11 +4,13 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { QrCode, Download, Share2 } from "lucide-react";
 import Image from "next/image";
+import { useToast } from "@/app/toast-context";
 
 export default function QRCodePage() {
   const [size, setSize] = useState(300);
   const menuUrl = typeof window !== "undefined" ? `${window.location.origin}/#menu` : "";
   const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(menuUrl)}`;
+  const { showToast } = useToast();
 
   const downloadQR = async () => {
     try {
@@ -77,7 +79,7 @@ export default function QRCodePage() {
                 onClick={() => {
                   const url = `${window.location.origin}/qr`;
                   navigator.clipboard.writeText(url);
-                  alert("QR code page URL copied to clipboard!");
+                  showToast("QR code page URL copied to clipboard!");
                 }}
                 className="inline-flex items-center gap-2 border-2 border-chocolate/20 text-chocolate px-6 py-3 rounded-full font-semibold hover:bg-chocolate/5 transition-colors"
               >

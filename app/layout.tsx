@@ -1,31 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Plus_Jakarta_Sans } from "next/font/google";
-import { CartProvider } from "./cart-context";
-import { CustomerProvider } from "./customer-context";
-import { ToastProvider } from "./toast-context";
-import { WishlistProvider } from "./wishlist-context";
-import { RecentlyViewedProvider } from "./recently-viewed-context";
-import { PromoProvider } from "./promo-context";
-import { ThemeProvider } from "./theme-context";
-import { OrderHistoryProvider } from "./order-history-context";
-import { ReservationProvider } from "./reservation-context";
-import { AuthProvider } from "./auth-context";
-import { LoyaltyProvider } from "./loyalty-context";
-import { GiftCardProvider } from "./gift-card-context";
-import { LanguageProvider } from "./language-context";
-import { TableProvider } from "./table-context";
-import { ReviewsProvider } from "./reviews-context";
-import { ShiftProvider } from "./shift-context";
-import { StaffProvider } from "./staff-context";
-import { InventoryProvider } from "./inventory-context";
-import { OrderScheduleProvider } from "./order-schedule-context";
-import { SplitBillingProvider } from "./split-billing-context";
-import { WaitlistProvider } from "./waitlist-context";
-import { ReferralProvider } from "./referral-context";
-import { DriverProvider } from "./driver-context";
-import { CateringProvider } from "./catering-context";
-import { SeasonalMenuProvider } from "./seasonal-menu-context";
-import { StaffScheduleProvider } from "./staff-schedule-context";
+import { Providers } from "./providers";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -46,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s | Happy Truffles Cafe"
   },
   description: "Experience artisan chocolate truffles, specialty coffee, matcha, and cozy vibes at Happy Truffles Cafe in C.T Plaza DA, South, CTA. Order online for delivery or dine-in.",
-  keywords: ["happy truffles cafe", "chocolate truffles", "specialty coffee", "matcha", "ct plaza", "south cta", "qatar restaurant", "cafe doha", "artisan chocolate", "cafe near me"],
+  keywords: ["happy truffles cafe", "chocolate truffles", "specialty coffee", "matcha", "ct plaza", "south cta", "qatar restaurant", "cafe doha", "artisan chocolate", "cafe near me", "best cafe in qatar", "truffles doha", "coffee shop qatar"],
   authors: [{ name: "Happy Truffles Cafe" }],
   creator: "Happy Truffles Cafe",
   publisher: "Happy Truffles Cafe",
@@ -55,7 +30,7 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_BASE_URL || "https://happy-truffles-cafe.vercel.app"),
   alternates: {
     canonical: "/",
   },
@@ -98,94 +73,77 @@ export const metadata: Metadata = {
   },
 };
 
-import { ServiceWorkerRegistrar } from "./components/service-worker-registrar";
-import { FirebaseMessaging } from "./components/firebase-messaging";
-import { SubscriptionProvider } from "./subscription-context";
-import { CustomizationProvider } from "./customization-context";
-import { CorporateProvider } from "./corporate-context";
-import { WhatsAppProvider } from "./whatsapp-context";
-import { BirthdayProvider } from "./birthday-context";
-import { UserProvider } from "./user-context";
-
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "CafeOrCoffeeShop",
+    name: "Happy Truffles Cafe",
+    description: "Artisan chocolate truffles, specialty coffee, matcha, and cozy vibes in Doha, Qatar.",
+    url: "https://happy-truffles-cafe.vercel.app",
+    image: "https://happy-truffles-cafe.vercel.app/hero.jpg",
+    address: {
+      "@type": "PostalAddress",
+      streetAddress: "C.T Plaza DA, South, CTA",
+      addressLocality: "Doha",
+      addressCountry: "QA",
+    },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: 25.2854,
+      longitude: 51.531,
+    },
+    openingHoursSpecification: {
+      "@type": "OpeningHoursSpecification",
+      dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Sunday"],
+      opens: "07:00",
+      closes: "23:30",
+    },
+    priceRange: "$$",
+    servesCuisine: ["Coffee", "Desserts", "Chocolate", "Breakfast"],
+    telephone: "+97400000000",
+  };
+
   return (
     <html lang="en">
+      <head>
+        {process.env.NEXT_PUBLIC_GA_ID && (
+          <>
+            <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`} />
+            <script
+              dangerouslySetInnerHTML={{
+                __html: `
+                  window.dataLayer = window.dataLayer || [];
+                  function gtag(){dataLayer.push(arguments);}
+                  gtag('js', new Date());
+                  gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}', {
+                    page_path: window.location.pathname,
+                  });
+                `,
+              }}
+            />
+          </>
+        )}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#D4A574" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Happy Truffles" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="mobile-web-app-capable" content="yes" />
+      </head>
       <body className={`${playfair.variable} ${jakarta.variable} font-jakarta antialiased`}>
-      <UserProvider>
-        <ThemeProvider>
-          <CustomerProvider>
-          <CartProvider>
-            <ToastProvider>
-              <WishlistProvider>
-                <RecentlyViewedProvider>
-                  <PromoProvider>
-                    <OrderHistoryProvider>
-                      <ReservationProvider>
-                        <AuthProvider>
-                          <LoyaltyProvider>
-                            <GiftCardProvider>
-                              <LanguageProvider>
-                                <TableProvider>
-                                  <ReviewsProvider>
-                                    <ShiftProvider>
-                                      <StaffProvider>
-                                        <InventoryProvider>
-                                          <OrderScheduleProvider>
-                                            <SplitBillingProvider>
-                                              <WaitlistProvider>
-                                                <ReferralProvider>
-                                                  <DriverProvider>
-                                                    <CateringProvider>
-                                                      <SeasonalMenuProvider>
-                                                        <StaffScheduleProvider>
-                                                          <ServiceWorkerRegistrar />
-                                                          <FirebaseMessaging />
-                                                          <SubscriptionProvider>
-                                                            <CustomizationProvider>
-                                                              <CorporateProvider>
-                                                                <WhatsAppProvider>
-                                                                  <BirthdayProvider>
-                                                                    {children}
-                                                                  </BirthdayProvider>
-                                                                </WhatsAppProvider>
-                                                              </CorporateProvider>
-                                                            </CustomizationProvider>
-                                                          </SubscriptionProvider>
-                                                        </StaffScheduleProvider>
-                                                      </SeasonalMenuProvider>
-                                                    </CateringProvider>
-                                                  </DriverProvider>
-                                                </ReferralProvider>
-                                              </WaitlistProvider>
-                                            </SplitBillingProvider>
-                                          </OrderScheduleProvider>
-                                        </InventoryProvider>
-                                      </StaffProvider>
-                                    </ShiftProvider>
-                                  </ReviewsProvider>
-                                </TableProvider>
-                              </LanguageProvider>
-                            </GiftCardProvider>
-                          </LoyaltyProvider>
-                        </AuthProvider>
-                      </ReservationProvider>
-                    </OrderHistoryProvider>
-                  </PromoProvider>
-                </RecentlyViewedProvider>
-              </WishlistProvider>
-            </ToastProvider>
-          </CartProvider>
-        </CustomerProvider>
-      </ThemeProvider>
-    </UserProvider>
+        <Providers>
+          {children}
+        </Providers>
       </body>
     </html>
   );
 }
-
-
-

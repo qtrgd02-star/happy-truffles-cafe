@@ -9,6 +9,7 @@ import { useCustomizations } from "@/app/customization-context";
 import { menuItems } from "@/app/menu-data";
 import { testimonials, type Review } from "@/app/reviews-data";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import {
@@ -118,7 +119,7 @@ function ReviewCard({ review }: { review: Review }) {
         &ldquo;{review.text}&rdquo;
       </p>
       {review.photo && (
-        <img src={review.photo} alt="Review photo" className="w-full h-48 object-cover rounded-xl mb-4 border border-chocolate/10" />
+        <Image src={review.photo} alt="Review photo" width={400} height={200} className="w-full h-48 object-cover rounded-xl mb-4 border border-chocolate/10" />
       )}
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 bg-truffle/10 rounded-full flex items-center justify-center">
@@ -140,6 +141,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const { showToast } = useToast();
   const { addToWishlist, removeFromWishlist, isInWishlist } = useWishlist();
   const { reviews: localReviews, addReview } = useReviews();
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [selectedSizeIndex, setSelectedSizeIndex] = useState(0);
@@ -559,6 +561,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                       });
                     }
                     showToast("Added to cart");
+                    router.push("/cart");
                   }}
                   className="w-full bg-truffle text-white py-4 rounded-full font-semibold text-lg hover:bg-chocolate transition-colors shadow-lg shadow-truffle/20 flex items-center justify-center gap-2"
                 >
@@ -765,7 +768,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
                       className="w-full border border-chocolate/20 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-truffle text-sm"
                     />
                     {reviewForm.photo && (
-                      <img src={reviewForm.photo} alt="Preview" className="mt-2 w-20 h-20 object-cover rounded-lg border border-chocolate/20" />
+                      <Image src={reviewForm.photo} alt="Preview" width={80} height={80} className="mt-2 w-20 h-20 object-cover rounded-lg border border-chocolate/20" unoptimized />
                     )}
                   </div>
                   <div>

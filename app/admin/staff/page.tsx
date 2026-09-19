@@ -12,6 +12,7 @@ export default function AdminStaffPage() {
   const { staff, addStaff, updateStaff, deleteStaff, refresh } = useStaff();
   const [showModal, setShowModal] = useState(false);
   const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null);
+  const [formError, setFormError] = useState("");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -36,7 +37,11 @@ export default function AdminStaffPage() {
   }
 
   const handleSubmit = async () => {
-    if (!formData.name || !formData.email) return;
+    setFormError("");
+    if (!formData.name.trim() || !formData.email.trim()) {
+      setFormError("Name and email are required");
+      return;
+    }
 
     if (editingStaff) {
       await updateStaff(editingStaff.id, formData);
@@ -186,6 +191,11 @@ export default function AdminStaffPage() {
                 </button>
               </div>
               <div className="space-y-4">
+                {formError && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+                    {formError}
+                  </div>
+                )}
                 <div>
                   <label className="block text-sm font-medium text-chocolate mb-1">Full Name</label>
                   <input

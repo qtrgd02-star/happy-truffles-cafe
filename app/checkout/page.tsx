@@ -6,6 +6,7 @@ import { usePromos } from "@/app/promo-context";
 import { useOrderHistory, type OrderType, type PaymentStatus } from "@/app/order-history-context";
 import { useLoyalty } from "@/app/loyalty-context";
 import { useGiftCards } from "@/app/gift-card-context";
+import { useToast } from "@/app/toast-context";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, CheckCircle, X, User, Mail, Phone, MapPin, MessageSquare, Ticket, MessageCircle } from "lucide-react";
@@ -18,6 +19,7 @@ export default function CheckoutPage() {
   const { addOrder } = useOrderHistory();
   const { addPoints } = useLoyalty();
   const { giftCards, applyGiftCard } = useGiftCards();
+  const { showToast } = useToast();
   const router = useRouter();
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
@@ -102,16 +104,25 @@ export default function CheckoutPage() {
     addPoints(form.phone, finalTotal);
     setOrderId(created.id);
 
+    let stockFailed = false;
     for (const item of cart) {
       try {
-        await fetch("/api/inventory", {
+        const stockRes = await fetch("/api/inventory", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ action: "deduct", menuItemId: item.id, quantity: item.quantity }),
         });
+        if (!stockRes.ok) {
+          stockFailed = true;
+        }
       } catch (error) {
         console.error("Failed to deduct stock:", error);
+        stockFailed = true;
       }
+    }
+
+    if (stockFailed) {
+      showToast("Order placed, but stock update had issues. Please check inventory.");
     }
 
     setOrderPlaced(true);

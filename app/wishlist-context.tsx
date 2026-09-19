@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode } from "react";
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
 import { useUser } from "@/app/user-context";
 
 export interface WishlistItem {
@@ -25,7 +25,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
   const { getUserKey } = useUser();
   const [wishlist, setWishlist] = useState<WishlistItem[]>([]);
 
-  const getWishlistKey = () => getUserKey("wishlist");
+  const getWishlistKey = useCallback(() => getUserKey("wishlist"), [getUserKey]);
 
   // Load from localStorage
   useEffect(() => {

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 const tourImages = [
   { id: 1, src: "/hero.jpg", title: "Entrance", description: "Welcome to Happy Truffles Cafe" },
@@ -19,7 +20,7 @@ export default function VirtualTour() {
     return (
       <div className="fixed inset-0 bg-black z-50 flex items-center justify-center" onClick={() => setIsFullscreen(false)}>
         <div className="relative w-full h-full max-w-5xl max-h-screen p-8 flex flex-col items-center justify-center">
-          <img src={tourImages[currentImage].src} alt={tourImages[currentImage].title} className="max-w-full max-h-full object-contain rounded-lg" />
+          <Image src={tourImages[currentImage].src} alt={tourImages[currentImage].title} fill className="max-w-full max-h-full object-contain rounded-lg" />
           <div className="absolute bottom-8 left-0 right-0 text-center">
             <p className="text-white text-xl font-playfair">{tourImages[currentImage].title}</p>
             <p className="text-white/70">{tourImages[currentImage].description}</p>
@@ -34,7 +35,7 @@ export default function VirtualTour() {
   return (
     <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
       <div className="relative">
-        <img src={tourImages[currentImage].src} alt={tourImages[currentImage].title} className="w-full h-96 object-cover" />
+        <Image src={tourImages[currentImage].src} alt={tourImages[currentImage].title} fill className="w-full h-96 object-cover" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end">
           <div className="p-6">
             <p className="text-white text-2xl font-playfair">{tourImages[currentImage].title}</p>

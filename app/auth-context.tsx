@@ -126,10 +126,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = async () => {
     try {
-      if (auth) {
-        await signOut(auth);
-      }
-      setUser(null);
+      await signOut(auth);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -165,7 +162,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const deleteAccount = async (email: string): Promise<boolean> => {
     try {
-      if (!db) return false;
       const usersRef = collection(db, "users");
       const q = query(usersRef, where("email", "==", email));
       const snapshot = await getDocs(q);
@@ -187,7 +183,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const getAccountsList = async (): Promise<Array<{ name: string; email: string; role: UserRole }>> => {
     try {
-      if (!db) return [];
       const usersRef = collection(db, "users");
       const q = query(usersRef, orderBy("email"));
       const snapshot = await getDocs(q);

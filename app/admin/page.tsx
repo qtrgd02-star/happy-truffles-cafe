@@ -31,10 +31,12 @@ import {
   Building2,
   MessageCircle,
   ShoppingCart,
+  ImageIcon,
+  FileText,
 } from "lucide-react";
 import Link from "next/link";
 
-type Tab = "orders" | "reservations" | "tables" | "menu" | "settings" | "analytics" | "reviews" | "subscriptions" | "corporate" | "whatsapp" | "talabat";
+type Tab = "orders" | "reservations" | "tables" | "menu" | "settings" | "analytics" | "reviews" | "subscriptions" | "corporate" | "whatsapp" | "talabat" | "gallery" | "blog";
 
 const statusConfig: Record<OrderStatus, { label: string; color: string; icon: typeof Package }> = {
   pending: { label: "Pending", color: "bg-yellow-100 text-yellow-800", icon: Clock },
@@ -211,6 +213,24 @@ export default function AdminPage() {
           >
             <ShoppingCart size={18} className="inline mr-2" />
             External Orders
+          </button>
+          <button
+            onClick={() => setTab("gallery")}
+            className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              tab === "gallery" ? "bg-truffle text-white" : "bg-white text-chocolate hover:bg-chocolate/5"
+            }`}
+          >
+            <ImageIcon size={18} className="inline mr-2" />
+            Gallery
+          </button>
+          <button
+            onClick={() => setTab("blog")}
+            className={`px-6 py-2 rounded-full font-semibold transition-colors ${
+              tab === "blog" ? "bg-truffle text-white" : "bg-white text-chocolate hover:bg-chocolate/5"
+            }`}
+          >
+            <FileText size={18} className="inline mr-2" />
+            Blog
           </button>
         </div>
 
@@ -826,6 +846,22 @@ export default function AdminPage() {
             <ShoppingCart size={48} className="text-chocolate/20 mx-auto mb-4" />
             <p className="text-chocolate/60 mb-4">Manage external orders at the External Orders page.</p>
             <Link href="/admin/talabat" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to External Orders</Link>
+          </div>
+        )}
+
+        {tab === "gallery" && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+            <ImageIcon size={48} className="text-chocolate/20 mx-auto mb-4" />
+            <p className="text-chocolate/60 mb-4">Manage gallery at the Gallery page.</p>
+            <Link href="/admin/gallery" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to Gallery</Link>
+          </div>
+        )}
+
+        {tab === "blog" && (
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
+            <FileText size={48} className="text-chocolate/20 mx-auto mb-4" />
+            <p className="text-chocolate/60 mb-4">Manage blog posts at the Blog page.</p>
+            <Link href="/admin/blog" className="inline-block bg-truffle text-white px-6 py-3 rounded-full font-semibold hover:bg-chocolate transition-colors">Go to Blog</Link>
           </div>
         )}
     </div>

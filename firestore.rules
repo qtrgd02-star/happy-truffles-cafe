@@ -73,6 +73,30 @@ service cloud.firestore {
       allow write: if hasRole(request.auth, ['admin', 'staff']);
     }
     
+    // Settings - public read, admin write
+    match /settings/{settingsId} {
+      allow read: if true;
+      allow write: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Shifts - staff/admin only
+    match /shifts/{shiftId} {
+      allow read: if request.auth != null && hasRole(request.auth, ['admin', 'staff']);
+      allow write: if request.auth != null && hasRole(request.auth, ['admin', 'staff']);
+    }
+    
+    // Gallery - public read, admin write
+    match /gallery/{imageId} {
+      allow read: if true;
+      allow write: if hasRole(request.auth, ['admin']);
+    }
+    
+    // Blog - public read, admin write
+    match /blog/{postId} {
+      allow read: if true;
+      allow write: if hasRole(request.auth, ['admin']);
+    }
+    
     // Default deny all other paths
     match /{document=**} {
       allow read, write: if false;

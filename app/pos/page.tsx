@@ -12,6 +12,8 @@ import { sendOrderConfirmationEmail } from "@/app/email-service";
 import { sendOrderConfirmationSms } from "@/app/sms-service";
 import { menuItems } from "@/app/menu-data";
 import { Plus, Minus, Trash2, ShoppingCart, Table as TableIcon, User, Phone, Mail, MapPin, FileText, CreditCard, Banknote, CheckCircle2, X, Search, Clock, Calendar, Users as UsersIcon, WifiOff, Wifi, RefreshCw } from "lucide-react";
+import Image from "next/image";
+import { useToast } from "@/app/toast-context";
 
 const categories = ["All", ...Array.from(new Set(menuItems.map((item) => item.category)))];
 
@@ -22,6 +24,7 @@ export default function POSPage() {
   const { activeShift, startShift, endShift } = useShifts();
   const { reservations, addReservation, clearReservations } = useReservations();
   const { updateStock } = useInventory();
+  const { showToast } = useToast();
 
   const [activeCategory, setActiveCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
@@ -191,7 +194,7 @@ export default function POSPage() {
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
     if (orderType === "dine-in" && !selectedTableId) {
-      alert("Please select a table for dine-in orders.");
+      showToast("Please select a table for dine-in orders.");
       return;
     }
 
@@ -254,7 +257,7 @@ export default function POSPage() {
 
   const handleAddReservation = () => {
     if (!reservationName || !reservationPhone || !reservationDate || !reservationTime) {
-      alert("Please fill in all required reservation fields.");
+      showToast("Please fill in all required reservation fields.");
       return;
     }
 
@@ -274,19 +277,19 @@ export default function POSPage() {
     setReservationTime("");
     setReservationGuests("2");
     setReservationNotes("");
-    alert("Reservation added successfully!");
+    showToast("Reservation added successfully!");
   };
 
   const handleWalkIn = () => {
     if (!walkInName || !walkInPhone) {
-      alert("Please enter walk-in details.");
+      showToast("Please enter walk-in details.");
       return;
     }
     setCustomerName(walkInName);
     setCustomerPhone(walkInPhone);
     setOrderType("dine-in");
     setPosView("menu");
-    alert(`Walk-in added for ${walkInGuests} guests. Please select a table.`);
+    showToast(`Walk-in added for ${walkInGuests} guests. Please select a table.`);
   };
 
   if (!isAuthenticated || (!hasRole("staff") && !hasRole("admin"))) {
@@ -455,7 +458,7 @@ export default function POSPage() {
                     className="bg-white rounded-xl shadow-sm border border-chocolate/10 p-3 text-left hover:shadow-md transition-all flex flex-col gap-2"
                   >
                     <div className="aspect-square bg-vanilla/30 rounded-lg flex items-center justify-center overflow-hidden">
-                      <img src={item.image} alt={item.title} className="w-full h-full object-cover" />
+                      <Image src={item.image} alt={item.title} width={200} height={200} className="w-full h-full object-cover" />
                     </div>
                     <div>
                       <p className="font-medium text-chocolate text-sm line-clamp-2">{item.title}</p>

@@ -32,7 +32,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const isSyncingRef = useRef(false);
 
-  const getCartKey = () => getUserKey("cart");
+  const getCartKey = useCallback(() => getUserKey("cart"), [getUserKey]);
 
   // Load cart from localStorage on initial mount
   useEffect(() => {

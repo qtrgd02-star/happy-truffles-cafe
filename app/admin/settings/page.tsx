@@ -25,15 +25,21 @@ export default function AdminSettingsPage() {
   });
   const [saved, setSaved] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+   useEffect(() => {
     const loadSettings = async () => {
       try {
+        setError(null);
         const res = await fetch("/api/admin/settings");
         const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to load settings");
+        }
         setSettings(data);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Failed to load settings:", error);
+        setError(error.message || "Failed to load settings");
       } finally {
         setLoading(false);
       }
@@ -43,17 +49,21 @@ export default function AdminSettingsPage() {
 
   const handleSave = async () => {
     try {
+      setError(null);
       const res = await fetch("/api/admin/settings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
       });
-      if (res.ok) {
-        setSaved(true);
-        setTimeout(() => setSaved(false), 3000);
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to save settings");
       }
-    } catch (error) {
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    } catch (error: any) {
       console.error("Failed to save settings:", error);
+      setError(error.message || "Failed to save settings");
     }
   };
 
@@ -82,6 +92,12 @@ export default function AdminSettingsPage() {
           Save Changes
         </button>
       </div>
+
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          {error}
+        </div>
+      )}
 
       {saved && (
         <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-6">

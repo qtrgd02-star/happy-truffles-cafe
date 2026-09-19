@@ -8,8 +8,10 @@ import { useCart } from "@/app/cart-context";
 import { useToast } from "@/app/toast-context";
 import Image from "next/image";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function WishlistPage() {
+  const router = useRouter();
   const { wishlist, removeFromWishlist, clearWishlist, wishlistCount } = useWishlist();
   const { addToCart } = useCart();
   const { showToast } = useToast();
@@ -29,6 +31,7 @@ export default function WishlistPage() {
     }
     showToast(`Added ${qty} x ${item.title} to cart`);
     setItemQuantities((prev) => ({ ...prev, [item.id]: 1 }));
+    router.push("/cart");
   };
 
   if (wishlist.length === 0) {

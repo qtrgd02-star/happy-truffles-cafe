@@ -8,7 +8,7 @@ interface CorporateContextType {
   addAccount: (account: Omit<CorporateAccount, "id">) => void;
   updateAccount: (id: string, updates: Partial<CorporateAccount>) => void;
   getAccount: (id: string) => CorporateAccount | undefined;
-  placeBulkOrder: (accountId: string, items: any[], total: number) => void;
+  placeBulkOrder: (accountId: string, items: any[], total: number) => { success: boolean; error?: string };
 }
 
 const CorporateContext = createContext<CorporateContextType | undefined>(undefined);
@@ -38,12 +38,14 @@ export function CorporateProvider({ children }: { children: ReactNode }) {
 
   const placeBulkOrder = useCallback((accountId: string, items: any[], total: number) => {
     const account = accounts.find((a) => a.id === accountId);
-    if (!account) return;
+    if (!account) {
+      return { success: false, error: "Account not found" };
+    }
     if (total > account.creditLimit) {
-      alert("Order exceeds credit limit");
-      return;
+      return { success: false, error: "Order exceeds credit limit" };
     }
     updateAccount(accountId, { balance: account.balance + total });
+    return { success: true };
   }, [accounts, updateAccount]);
 
   return (

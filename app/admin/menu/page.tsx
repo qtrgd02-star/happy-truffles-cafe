@@ -22,6 +22,7 @@ export default function AdminMenuPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [validationError, setValidationError] = useState("");
   const [form, setForm] = useState({ title: "", description: "", price: "", category: "Truffles & Bites", image: "/menu/menu-001.jpg" });
 
   const loadMenu = async () => {
@@ -48,8 +49,9 @@ export default function AdminMenuPage() {
   }, []);
 
   const handleSave = async () => {
+    setValidationError("");
     if (!form.title.trim() || !form.price) {
-      alert("Title and price are required");
+      setValidationError("Title and price are required");
       return;
     }
     setSaving(true);
@@ -135,9 +137,14 @@ export default function AdminMenuPage() {
       )}
 
       <div className="space-y-6">
-        {(isAddingNew || editingId !== null) && (
+      {(isAddingNew || editingId !== null) && (
           <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
             <h2 className="font-semibold text-chocolate mb-4">{isAddingNew ? "New Item" : "Edit Item"}</h2>
+            {validationError && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
+                {validationError}
+              </div>
+            )}
             <div className="grid gap-4 max-w-2xl">
               <div>
                 <label className="block text-sm font-medium text-chocolate mb-1">Title</label>
@@ -175,8 +182,27 @@ export default function AdminMenuPage() {
         )}
 
         {loading ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-12 text-center">
-            <p className="text-chocolate/60">Loading menu...</p>
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-vanilla/30">
+                <tr>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-chocolate">Title</th>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-chocolate">Category</th>
+                  <th className="text-left px-6 py-3 text-sm font-semibold text-chocolate">Price</th>
+                  <th className="text-right px-6 py-3 text-sm font-semibold text-chocolate">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-chocolate/10">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <tr key={i}>
+                    <td className="px-6 py-4"><div className="h-4 bg-vanilla/30 rounded animate-pulse w-3/4" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-vanilla/30 rounded animate-pulse w-1/2" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-vanilla/30 rounded animate-pulse w-1/4" /></td>
+                    <td className="px-6 py-4"><div className="h-4 bg-vanilla/30 rounded animate-pulse w-16 ml-auto" /></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         ) : (
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
