@@ -178,11 +178,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         errorMessage = "Too many requests. Please try again later.";
       }
       
-      return { success: false, error: errorMessage };
-    }
-  };
+return { success: false, error: errorMessage };
+     }
+   };
 
-  const hasRole = (role: UserRole): boolean => {
+   const logout = async (): Promise<void> => {
+     try {
+       if (!auth) return;
+       await signOut(auth);
+     } catch (error) {
+       console.error("Logout failed:", error);
+     }
+   };
+
+   const hasRole = (role: UserRole): boolean => {
     if (!user) return false;
     if (user.email === "admin@happytruffles.qa") return true;
     if (user.role === "admin") return true;
