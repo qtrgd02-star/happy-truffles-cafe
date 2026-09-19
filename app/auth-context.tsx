@@ -36,9 +36,9 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   login: (email: string, password: string) => Promise<boolean>;
-  register: (name: string, email: string, password: string, role?: UserRole) => Promise<boolean>;
+  register: (name: string, email: string, password: string, role?: UserRole) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
-  forgotPassword: (email: string) => Promise<boolean>;
+  forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   isAuthenticated: boolean;
   hasRole: (role: UserRole) => boolean;
   updateAccountRole: (email: string, role: UserRole) => Promise<boolean>;
@@ -124,7 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Login failed:", error);
       if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
         try {
-          if (!auth || !db) return false;
+if (!auth || !db) return { success: false, error: "Authentication not available" };
           const cred = await createUserWithEmailAndPassword(auth, email, password);
           await setDoc(doc(db, "users", cred.user.uid), {
             name: email.split("@")[0],
@@ -132,7 +132,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             role: email === "admin@happytruffles.qa" ? "admin" : "customer",
             createdAt: new Date().toISOString(),
           });
-          return true;
+return { success: true };
         } catch (createError) {
           console.error("Auto-create user failed:", createError);
           return false;
@@ -142,22 +142,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const register = async (name: string, email: string, password: string, role: UserRole = "customer"): Promise<boolean> => {
+  const register = async (name: string, email: string, password: string, role: UserRole = "customer"): Promise<{ success: boolean; error?: string }> => {
     try {
-      if (!auth || !db) return false;
+      if (!auth || !db) return { success: false, error: "Authentication not available" };
       const result = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, "users", result.user.uid), {
         name,
         email,
         role,
         createdAt: new Date().toISOString(),
-      });
-      return true;
-    } catch (error) {
+});
+       return { success: true };
+     } catch (error) {
       console.error("Registration failed:", error);
-      return false;
-    }
-  };
+      let errorMessage = "Registration failed. Please try again.";
+      
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Email already registered";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "Password should be at least 6 characters.";
+      }
+      
+      return { success: false, error: errorMessage };
+    };
 
   const forgotPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
     if (!auth) return { success: false, error: "Authentication not available" };
@@ -279,7 +288,6 @@ return { success: false, error: errorMessage };
       {children}
     </AuthContext.Provider>
   );
-}
 
 export function useAuth() {
   const context = useContext(AuthContext);
