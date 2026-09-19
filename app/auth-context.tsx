@@ -6,7 +6,8 @@ import {
   createUserWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  User as FirebaseUser
+  User as FirebaseUser,
+  sendPasswordResetEmail
 } from "firebase/auth";
 import { 
   doc, 
@@ -37,6 +38,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<boolean>;
   register: (name: string, email: string, password: string, role?: UserRole) => Promise<boolean>;
   logout: () => Promise<void>;
+  forgotPassword: (email: string) => Promise<boolean>;
   isAuthenticated: boolean;
   hasRole: (role: UserRole) => boolean;
   updateAccountRole: (email: string, role: UserRole) => Promise<boolean>;
@@ -157,12 +159,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logout = async () => {
+  const forgotPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
+    if (!auth) return { success: false, error: "Authentication not available" };
+    
     try {
-      if (!auth) return;
-      await signOut(auth);
+      await sendPasswordResetEmail(auth, email);
+      return { success: true };
     } catch (error) {
-      console.error("Logout failed:", error);
+      console.error("Password reset failed:", error);
+      // Provide user-friendly error messages
+      let errorMessage = "Password reset failed. Please try again.";
+      
+      if (error.code === "auth/user-not-found") {
+        errorMessage = "No account found with this email address.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "Too many requests. Please try again later.";
+      }
+      
+      return { success: false, error: errorMessage };
     }
   };
 
