@@ -157,7 +157,8 @@ export default function CheckoutPage() {
     router.push("/#menu");
   };
 
-  const earnedPoints = Math.floor(finalTotal);
+  // Calculate loyalty points using the same 5% rule defined in LoyaltyContext.
+  const earnedPoints = Math.floor(finalTotal * 0.05);
 
   if (orderPlaced) {
     return (

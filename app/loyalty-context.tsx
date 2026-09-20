@@ -47,8 +47,13 @@ export function LoyaltyProvider({ children }: { children: ReactNode }) {
     setAccounts(newAccounts);
   };
 
+  // Earn loyalty points based on a percentage of the order total.
+  // Business rule: 5% of the order total (rounded down) equals earned points.
+  // This provides points for any order amount, even small ones, instead of the
+  // previous implementation which gave one point per whole QAR spent (floor of
+  // the total). The previous logic resulted in `0` points for orders under 1 QAR.
   const addPoints = (phone: string, orderTotal: number) => {
-    const pointsEarned = Math.floor(orderTotal);
+    const pointsEarned = Math.floor(orderTotal * 0.05);
     const newAccounts = [...accounts];
     const index = newAccounts.findIndex((a) => a.phone === phone);
 
