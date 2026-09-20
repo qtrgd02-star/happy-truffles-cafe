@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useCart } from "@/app/cart-context";
 import { usePromos } from "@/app/promo-context";
 import { useOrderHistory, type OrderType, type PaymentStatus } from "@/app/order-history-context";
@@ -8,6 +8,7 @@ import { useLoyalty } from "@/app/loyalty-context";
 import { useGiftCards } from "@/app/gift-card-context";
 import { useToast } from "@/app/toast-context";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/auth-context";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShoppingCart, CheckCircle, X, User, Mail, Phone, MapPin, MessageSquare, Ticket, MessageCircle } from "lucide-react";
 import Link from "next/link";
@@ -21,6 +22,27 @@ export default function CheckoutPage() {
   const { giftCards, applyGiftCard } = useGiftCards();
   const { showToast } = useToast();
   const router = useRouter();
+  const { user, saveProfile } = useAuth();
+
+  // Auto-fill checkout form when logged-in user loads
+  useEffect(() => {
+    if (user) {
+      setForm((prev) => ({
+        ...prev,
+        name: user.name || "",
+        email: user.email || "",
+        phone: user.phone || prev.phone,
+        address: user.address || prev.address,
+        notes: prev.notes,
+      }));
+    }
+  }, [user]);
+
+  // Save user profile (phone + address) for next visits
+    const handleSaveProfileAfterOrder = async (phone: string, address: string) => {
+    if (user && (phone || address)) await saveProfile(phone, address);
+  };
+
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderId, setOrderId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -126,6 +148,7 @@ export default function CheckoutPage() {
     }
 
     setOrderPlaced(true);
+    await handleSaveProfileAfterOrder(form.phone, form.address);
     removePromo();
     clearCart();
   };

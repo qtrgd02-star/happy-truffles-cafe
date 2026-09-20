@@ -31,6 +31,8 @@ export interface User {
   name: string;
   role: UserRole;
   uid: string;
+  phone?: string;
+  address?: string;
 }
 
 interface AuthContextType {
@@ -38,6 +40,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string, role?: UserRole) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
+  saveProfile: (phone: string, address: string) => Promise<boolean>;
   forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
   isAuthenticated: boolean;
   hasRole: (role: UserRole) => boolean;
@@ -75,6 +78,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               name: userData.name || "",
               role: userData.role || "customer",
               uid: firebaseUser.uid,
+              phone: userData.phone || "",
+              address: userData.address || "",
             });
           } else {
             setUser({
@@ -212,6 +217,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const saveProfile = async (phone: string, address: string): Promise<boolean> => {
+    try {
+      if (!db || !user) return false;
+      await setDoc(
+        doc(db, "users", user.uid),
+        { phone, address },
+        { merge: true }
+      );
+      setUser((prev) => (prev ? { ...prev, phone, address } : null));
+      return true;
+    } catch (error) {
+      console.error("Save profile failed:", error);
+      return false;
+    }
+  };
+
   const hasRole = (role: UserRole): boolean => {
     if (!user) return false;
     if (user.email === "admin@happytruffles.qa") return true;
@@ -285,18 +306,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      login, 
+    <AuthContext.Provider value={{
+      user,
+      login,
       register,
-      forgotPassword, 
-      logout, 
-      isAuthenticated: !!user, 
-      hasRole, 
-      updateAccountRole, 
-      deleteAccount, 
+      forgotPassword,
+      logout,
+      saveProfile,
+      isAuthenticated: !!user,
+      hasRole,
+      updateAccountRole,
+      deleteAccount,
       getAccountsList,
-      loading 
+      loading
     }}>
       {children}
     </AuthContext.Provider>
