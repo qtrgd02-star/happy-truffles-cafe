@@ -43,33 +43,16 @@ export default function CartDrawer({ scrolled, isOpen, onClose }: { scrolled?: b
   };
 
   return (
-    <>
-      <button
-        onClick={() => setDrawerOpen(true)}
-        className={`relative transition-colors ${
-          scrolled ? "text-chocolate/80 hover:text-truffle" : "text-white/80 hover:text-white"
-        }`}
-        aria-label="Open cart"
-        style={{ position: 'relative', zIndex: 50 }}
-      >
-        <ShoppingCart size={20} />
-        {cartCount > 0 && (
-          <span className="absolute -top-2 -right-2 bg-truffle text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-            {cartCount}
-          </span>
-        )}
-      </button>
-
-      <AnimatePresence>
-        {drawerOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setDrawerOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
-            />
+    <AnimatePresence>
+      {drawerOpen && (
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setDrawerOpen(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[9998]"
+          />
             <motion.div
               initial={{ x: "100%" }}
               animate={{ x: 0 }}
@@ -273,6 +256,5 @@ export default function CartDrawer({ scrolled, isOpen, onClose }: { scrolled?: b
           </>
         )}
       </AnimatePresence>
-    </>
   );
 }
