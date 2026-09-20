@@ -41,7 +41,8 @@ export default function LoginPage() {
       
       if (result.success) {
         showToast("Welcome back!");
-        router.push("/admin");
+        // Send customers to the public home page after login.
+        router.push("/");
       } else {
         setError(result.error || "Invalid email or password");
       }
