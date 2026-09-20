@@ -35,7 +35,7 @@ export interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (name: string, email: string, password: string, role?: UserRole) => Promise<{ success: boolean; error?: string }>;
   logout: () => Promise<void>;
   forgotPassword: (email: string) => Promise<{ success: boolean; error?: string }>;
@@ -121,19 +121,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     ensureDefaultAdmin();
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string }> => {
     try {
-      if (!auth) return false;
+      if (!auth) return { success: false, error: "Authentication not available" };
       await signInWithEmailAndPassword(auth, email, password);
-      return true;
+      return { success: true };
     } catch (error) {
       console.error("Login failed:", error);
+      let errorMessage = "Invalid email or password.";
       const code = getAuthErrorCode(error);
-      
+
       if (code === "auth/user-not-found") {
-        return false;
+        errorMessage = "No account found with this email address.";
+      } else if (code === "auth/wrong-password") {
+        errorMessage = "Incorrect password. Please try again.";
+      } else if (code === "auth/invalid-email") {
+        errorMessage = "Please enter a valid email address.";
+      } else if (code === "auth/too-many-requests") {
+        errorMessage = "Too many attempts. Please try again later.";
+      } else if (code === "auth/invalid-credential") {
+        errorMessage = "Invalid email or password.";
       }
-      return false;
+      return { success: false, error: errorMessage };
     }
   };
 

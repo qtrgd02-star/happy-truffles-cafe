@@ -36,14 +36,14 @@ export default function LoginPage() {
       }
     } else {
       // Handle login submission
-      const success = await login(form.email, form.password);
+      const result = await login(form.email, form.password);
       setIsLoading(false);
       
-      if (success) {
+      if (result.success) {
         showToast("Welcome back!");
         router.push("/admin");
       } else {
-        setError("Invalid email or password");
+        setError(result.error || "Invalid email or password");
       }
     }
   };

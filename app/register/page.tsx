@@ -17,12 +17,12 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = await register(form.name, form.email, form.password);
-    if (success) {
+    const result = await register(form.name, form.email, form.password);
+    if (result.success) {
       showToast("Account created successfully!");
       router.push("/");
     } else {
-      setError("Email already registered");
+      setError(result.error || "Registration failed. Please try again.");
     }
   };
 

@@ -104,9 +104,12 @@ service cloud.firestore {
   }
 }
 
-// Helper function to check user roles
+// Helper functions
 function hasRole(auth, roles) {
-  return auth != null && 
-    (auth.token.email == "admin@happytruffles.qa" || 
-     roles.hasAny([auth.token.role]));
+  return auth != null && roles.hasAny([getUserRole()]);
+}
+
+function getUserRole() {
+  let userDoc = /databases/$(database)/documents/users/$(request.auth.uid);
+  return exists(userDoc) ? get(userDoc)..data.role : (request.auth.token.email == "admin@happytruffles.qa" ? "admin" : null);
 }
