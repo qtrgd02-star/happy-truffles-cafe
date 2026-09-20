@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import { useAuth } from "@/app/auth-context";
+import { AuthContext } from "@/app/auth-context";
 
 export interface CustomerData {
   email: string;
@@ -27,7 +27,11 @@ interface CustomerContextType {
 const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
 
 export function CustomerProvider({ children }: { children: ReactNode }) {
-  const { user } = useAuth();
+  // CustomerProvider is intentionally rendered outside AuthProvider in the
+  // provider tree, so read the auth user in a null-safe way instead of calling
+  // useAuth() (which throws when no AuthProvider is in scope).
+  const authContext = useContext(AuthContext);
+  const user = authContext ? authContext.user : null;
   const [customerData, setCustomerDataState] = useState<CustomerData | null>(null);
 
   const setCustomerData = (data: CustomerData | null) => {
