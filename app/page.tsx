@@ -456,7 +456,19 @@ export default function Home() {
                      {wishlistCount}
                    </span>
                  )}
-               </Link>
+                              </Link>
+                <button
+                  onClick={() => router.push("/cart")}
+                  className="relative text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors"
+                  aria-label="View Cart"
+                >
+                  <ShoppingCart size={20} />
+                  {cartCount > 0 && (
+                    <span className="absolute -top-2 -right-2 bg-truffle text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
                 <button
                   onClick={toggleTheme}
                   className="text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors"
