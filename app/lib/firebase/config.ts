@@ -14,33 +14,17 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// IMPORTANT: Use STATIC property access (process.env.NEXT_PUBLIC_*) everywhere.
-// Next.js only inlines NEXT_PUBLIC_* vars into the client bundle when they are
-// read via static access. Dynamic access such as process.env[key] is NOT
-// inlined and evaluates to undefined in the browser, which previously made
-// Firebase look "not configured" and auth null on the deployed site.
-const requiredEnvVars: Array<[string, string | undefined]> = [
-  ["NEXT_PUBLIC_FIREBASE_API_KEY", process.env.NEXT_PUBLIC_FIREBASE_API_KEY],
-  ["NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN", process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN],
-  ["NEXT_PUBLIC_FIREBASE_PROJECT_ID", process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID],
-  ["NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET", process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET],
-  ["NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID", process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID],
-  ["NEXT_PUBLIC_FIREBASE_APP_ID", process.env.NEXT_PUBLIC_FIREBASE_APP_ID],
-];
 
-const missingEnvVars = requiredEnvVars
-  .filter(([, value]) => !value)
-  .map(([name]) => name);
-
-let app: FirebaseApp | null = null;
-
-if (missingEnvVars.length > 0) {
-  console.warn(
-    `Missing Firebase environment variables: ${missingEnvVars.join(", ")}. Firebase will not be initialized.`
-  );
-} else {
-  app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-}
+// The Firebase config values are inlined into the client bundle at build time by
+// next/webpack from the NEXT_PUBLIC_* env vars (confirmed inline with real values
+// in the deployed bundle). They are public client-side credentials.
+//
+// We intentionally initialize Firebase unconditionally. A runtime gate that
+// checks browser `process.env` (always empty on the client) leaves auth/db null
+// and breaks login with "Authentication not available" — a previous attempt used
+// requiredEnvVars/missingEnvVars and was mangled by webpack into `[KEY...].filter(
+// e=>process.env[e])`, which always returned non-empty on the client. Removed.
+const app: FirebaseApp = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 export const auth = app ? getAuth(app) : null;
 export const db = app ? getFirestore(app) : null;
