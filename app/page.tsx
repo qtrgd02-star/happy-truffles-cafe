@@ -407,17 +407,38 @@ export default function Home() {
 
              {/* Desktop Links */}
              <div className="hidden md:flex items-center gap-6">
-                {["Home", "About", "Menu", "Gallery", "Reviews", "Contact", "Orders", "Reservations"].map(
-                  (item) => (
+                          {["Home", "About", "Menu", "Gallery", "Reviews", "Contact", "Orders", "Reservations"].map(
+                (item) => {
+                  if (item === "Orders") {
+                    return (
+                      <Link
+                        key={item}
+                        href={user ? "/order" : "/login"}
+                        className="text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors font-medium text-sm tracking-wide"
+                      >
+                        {item}
+                      </Link>
+                    );
+                  }
+                  return (
                     <a
                       key={item}
-                      href={["Orders", "Reservations", "QR", "Gift Cards", "Table Order", "Kitchen", "Gallery"].includes(item) ? `/${item.toLowerCase()}` : `#${item.toLowerCase()}`}
+                      href={[
+                        "Orders",
+                        "Reservations",
+                        "QR",
+                        "Gift Cards",
+                        "Table Order",
+                        "Kitchen",
+                        "Gallery",
+                      ].includes(item) ? `/${item.toLowerCase()}` : `#${item.toLowerCase()}`}
                       className="text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors font-medium text-sm tracking-wide"
                     >
                       {item}
                     </a>
-                  )
-                )}
+                  );
+                }
+              )}
                <button
                  onClick={() => setIsSearchOpen(!isSearchOpen)}
                  className="text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors"
@@ -426,7 +447,7 @@ export default function Home() {
                  <Search size={20} />
                </button>
                <Link
-                 href="/wishlist"
+                 href={user ? "/wishlist" : "/login"}
                  className="text-chocolate/80 dark:text-vanilla/80 hover:text-truffle transition-colors flex items-center gap-1"
                >
                  <Heart size={20} />
@@ -546,7 +567,7 @@ export default function Home() {
                 Visit Us
               </a>
               <button
-                onClick={() => { setIsCartOpen(true); setMobileOpen(false); }}
+                onClick={() => { router.push("/cart"); setMobileOpen(false); }}
                 className="w-full mt-3 bg-truffle text-white px-6 py-3 rounded-full font-medium hover:bg-chocolate transition-colors flex items-center justify-center gap-2"
               >
                 <ShoppingCart size={18} />
