@@ -142,28 +142,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!auth || !db) return { success: false, error: "Authentication not available" };
       const result = await createUserWithEmailAndPassword(auth, email, password);
       await setDoc(doc(db, "users", result.user.uid), {
-        name,
-        email,
-        role,
-        createdAt: new Date().toISOString(),
-      });
-      return { success: true };
-    } catch (error) {
-      console.error("Registration failed:", error);
-      let errorMessage = "Registration failed. Please try again.";
-      const code = getAuthErrorCode(error);
-      
-      if (code === "auth/email-already-in-use") {
-        errorMessage = "Email already registered";
-      } else if (code === "auth/invalid-email") {
-        errorMessage = "Please enter a valid email address.";
-      } else if (code === "auth/weak-password") {
-        errorMessage = "Password should be at least 6 characters.";
-      }
-      
-      return { success: false, error: errorMessage };
-    }
-  };
+         name,
+         email,
+         role,
+         createdAt: new Date().toISOString(),
+       });
+       return { success: true };
+     } catch (error) {
+       console.error("Registration failed:", error);
+       let errorMessage = "Registration failed. Please try again.";
+       const code = getAuthErrorCode(error);
+       
+       if (code === "auth/email-already-in-use") {
+         errorMessage = "Email already registered";
+         return { success: false, error: errorMessage };
+       } else if (code === "auth/invalid-email") {
+         errorMessage = "Please enter a valid email address.";
+         return { success: false, error: errorMessage };
+       } else if (code === "auth/weak-password") {
+         errorMessage = "Password should be at least 6 characters.";
+         return { success: false, error: errorMessage };
+       }
+       
+       return { success: false, error: errorMessage };
+     }
+   };
 
   const forgotPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
     if (!auth) return { success: false, error: "Authentication not available" };
@@ -178,10 +181,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (code === "auth/user-not-found") {
         errorMessage = "No account found with this email address.";
+        return { success: false, error: errorMessage };
       } else if (code === "auth/invalid-email") {
         errorMessage = "Please enter a valid email address.";
+        return { success: false, error: errorMessage };
       } else if (code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please try again later.";
+        return { success: false, error: errorMessage };
       }
       
       return { success: false, error: errorMessage };
