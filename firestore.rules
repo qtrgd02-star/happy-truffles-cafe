@@ -101,15 +101,16 @@ service cloud.firestore {
     match /{document=**} {
       allow read, write: if false;
     }
+    
+    // Helper functions - defined within this match scope so `database` binding,
+    // get() and exists() work correctly.
+    function hasRole(auth, roles) {
+      return auth != null && roles.hasAny([getUserRole()]);
+    }
+
+    function getUserRole() {
+      let userDoc = /databases/$(database)/documents/users/$(request.auth.uid);
+      return exists(userDoc) ? get(userDoc).data.role : (request.auth.token.email == "admin@happytruffles.qa" ? "admin" : null);
+    }
   }
-}
-
-// Helper functions
-function hasRole(auth, roles) {
-  return auth != null && roles.hasAny([getUserRole()]);
-}
-
-function getUserRole() {
-  let userDoc = /databases/$(database)/documents/users/$(request.auth.uid);
-  return exists(userDoc) ? get(userDoc)..data.role : (request.auth.token.email == "admin@happytruffles.qa" ? "admin" : null);
 }
