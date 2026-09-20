@@ -49,6 +49,12 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+function getAuthErrorCode(error: unknown): string | undefined {
+  if (typeof error !== "object" || error === null || !("code" in error)) return undefined;
+  const code = (error as { code?: unknown }).code;
+  return typeof code === "string" ? code : undefined;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -118,25 +124,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       if (!auth) return false;
-      const result = await signInWithEmailAndPassword(auth, email, password);
+      await signInWithEmailAndPassword(auth, email, password);
       return true;
-    } catch (error: any) {
+    } catch (error) {
       console.error("Login failed:", error);
-      if (error.code === "auth/user-not-found" || error.code === "auth/wrong-password" || error.code === "auth/invalid-credential") {
-        try {
-if (!auth || !db) return { success: false, error: "Authentication not available" };
-          const cred = await createUserWithEmailAndPassword(auth, email, password);
-          await setDoc(doc(db, "users", cred.user.uid), {
-            name: email.split("@")[0],
-            email,
-            role: email === "admin@happytruffles.qa" ? "admin" : "customer",
-            createdAt: new Date().toISOString(),
-          });
-return { success: true };
-        } catch (createError) {
-          console.error("Auto-create user failed:", createError);
-          return false;
-        }
+      const code = getAuthErrorCode(error);
+      
+      if (code === "auth/user-not-found") {
+        return false;
       }
       return false;
     }
@@ -151,22 +146,24 @@ return { success: true };
         email,
         role,
         createdAt: new Date().toISOString(),
-});
-       return { success: true };
-     } catch (error) {
+      });
+      return { success: true };
+    } catch (error) {
       console.error("Registration failed:", error);
       let errorMessage = "Registration failed. Please try again.";
+      const code = getAuthErrorCode(error);
       
-      if (error.code === "auth/email-already-in-use") {
+      if (code === "auth/email-already-in-use") {
         errorMessage = "Email already registered";
-      } else if (error.code === "auth/invalid-email") {
+      } else if (code === "auth/invalid-email") {
         errorMessage = "Please enter a valid email address.";
-      } else if (error.code === "auth/weak-password") {
+      } else if (code === "auth/weak-password") {
         errorMessage = "Password should be at least 6 characters.";
       }
       
       return { success: false, error: errorMessage };
-    };
+    }
+  };
 
   const forgotPassword = async (email: string): Promise<{ success: boolean; error?: string }> => {
     if (!auth) return { success: false, error: "Authentication not available" };
@@ -176,31 +173,31 @@ return { success: true };
       return { success: true };
     } catch (error) {
       console.error("Password reset failed:", error);
-      // Provide user-friendly error messages
       let errorMessage = "Password reset failed. Please try again.";
+      const code = getAuthErrorCode(error);
       
-      if (error.code === "auth/user-not-found") {
+      if (code === "auth/user-not-found") {
         errorMessage = "No account found with this email address.";
-      } else if (error.code === "auth/invalid-email") {
+      } else if (code === "auth/invalid-email") {
         errorMessage = "Please enter a valid email address.";
-      } else if (error.code === "auth/too-many-requests") {
+      } else if (code === "auth/too-many-requests") {
         errorMessage = "Too many requests. Please try again later.";
       }
       
-return { success: false, error: errorMessage };
-     }
-   };
+      return { success: false, error: errorMessage };
+    }
+  };
 
-   const logout = async (): Promise<void> => {
-     try {
-       if (!auth) return;
-       await signOut(auth);
-     } catch (error) {
-       console.error("Logout failed:", error);
-     }
-   };
+  const logout = async (): Promise<void> => {
+    try {
+      if (!auth) return;
+      await signOut(auth);
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
-   const hasRole = (role: UserRole): boolean => {
+  const hasRole = (role: UserRole): boolean => {
     if (!user) return false;
     if (user.email === "admin@happytruffles.qa") return true;
     if (user.role === "admin") return true;
@@ -276,7 +273,8 @@ return { success: false, error: errorMessage };
     <AuthContext.Provider value={{ 
       user, 
       login, 
-      register, 
+      register,
+      forgotPassword, 
       logout, 
       isAuthenticated: !!user, 
       hasRole, 
@@ -287,8 +285,9 @@ return { success: false, error: errorMessage };
     }}>
       {children}
     </AuthContext.Provider>
-);
- 
+  );
+}
+
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) throw new Error("useAuth must be used within AuthProvider");

@@ -1,146 +1,75 @@
 "use client";
 
-import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
-import { useUser } from "@/app/user-context";
+import { createContext, useContext, useState, ReactNode } from "react";
+import { useAuth } from "@/app/auth-context";
 
-export interface CustomerProfile {
-  id: string;
-  name: string;
+export interface CustomerData {
   email: string;
+  name: string;
   phone: string;
-  addresses: Address[];
-  favoriteItems: number[];
-  orderHistory: string[];
-  createdAt: string;
-}
-
-export interface Address {
-  id: string;
-  label: string;
-  address: string;
-  city: string;
-  isDefault: boolean;
+  address: {
+    street: string;
+    city: string;
+    state: string;
+    zipCode: string;
+    country: string;
+  };
+  notes?: string;
 }
 
 interface CustomerContextType {
-  profile: CustomerProfile | null;
-  isProfileLoaded: boolean;
-  createProfile: (profile: Omit<CustomerProfile, "id" | "createdAt">) => void;
-  updateProfile: (updates: Partial<CustomerProfile>) => void;
-  addAddress: (address: Omit<Address, "id">) => void;
-  removeAddress: (addressId: string) => void;
-  addFavoriteItem: (itemId: number) => void;
-  removeFavoriteItem: (itemId: number) => void;
-  isFavorite: (itemId: number) => boolean;
-  loadProfile: (phone: string) => CustomerProfile | null;
+  customerData: CustomerData | null;
+  setCustomerData: (data: CustomerData | null) => void;
+  clearCustomerData: () => void;
+  saveCustomerData: () => Promise<boolean>;
 }
 
 const CustomerContext = createContext<CustomerContextType | undefined>(undefined);
 
 export function CustomerProvider({ children }: { children: ReactNode }) {
-  const { getUserKey } = useUser();
-  const [profile, setProfile] = useState<CustomerProfile | null>(null);
-  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+  const { user } = useAuth();
+  const [customerData, setCustomerDataState] = useState<CustomerData | null>(null);
 
-  const profileKey = getUserKey("customerProfile");
-
-  useEffect(() => {
-    const saved = localStorage.getItem(profileKey);
-    if (saved) {
-      setProfile(JSON.parse(saved));
-    }
-    setIsProfileLoaded(true);
-  }, [profileKey]);
-
-  const saveProfile = (newProfile: CustomerProfile | null) => {
-    if (newProfile) {
-      localStorage.setItem(profileKey, JSON.stringify(newProfile));
-    } else {
-      localStorage.removeItem(profileKey);
-    }
-    setProfile(newProfile);
+  const setCustomerData = (data: CustomerData | null) => {
+    setCustomerDataState(data);
   };
 
-  const createProfile = (profileData: Omit<CustomerProfile, "id" | "createdAt">) => {
-    const newProfile: CustomerProfile = {
-      ...profileData,
-      id: "cust-" + Date.now(),
-      createdAt: new Date().toISOString(),
-    };
-    saveProfile(newProfile);
+  const clearCustomerData = () => {
+    setCustomerDataState(null);
   };
 
-  const updateProfile = (updates: Partial<CustomerProfile>) => {
-    if (!profile) return;
-    saveProfile({ ...profile, ...updates });
-  };
-
-  const addAddress = (address: Omit<Address, "id">) => {
-    if (!profile) return;
-    const newAddress = { ...address, id: "addr-" + Date.now() };
-    saveProfile({
-      ...profile,
-      addresses: [...profile.addresses, newAddress],
-    });
-  };
-
-  const removeAddress = (addressId: string) => {
-    if (!profile) return;
-    saveProfile({
-      ...profile,
-      addresses: profile.addresses.filter((a) => a.id !== addressId),
-    });
-  };
-
-  const addFavoriteItem = (itemId: number) => {
-    if (!profile) return;
-    if (!profile.favoriteItems.includes(itemId)) {
-      saveProfile({
-        ...profile,
-        favoriteItems: [...profile.favoriteItems, itemId],
+  const saveCustomerData = async (): Promise<boolean> => {
+    if (!user?.email) return false;
+    
+    try {
+      const response = await fetch("/api/customers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...customerData,
+          email: user.email,
+          savedAt: new Date().toISOString(),
+        }),
       });
-    }
-  };
-
-  const removeFavoriteItem = (itemId: number) => {
-    if (!profile) return;
-    saveProfile({
-      ...profile,
-      favoriteItems: profile.favoriteItems.filter((id) => id !== itemId),
-    });
-  };
-
-  const isFavorite = (itemId: number) => {
-    return profile?.favoriteItems.includes(itemId) || false;
-  };
-
-  const loadProfile = useCallback((phone: string) => {
-    const saved = localStorage.getItem(profileKey);
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.phone === phone) {
-        setProfile(parsed);
-        return parsed;
+      
+      if (response.ok) {
+        console.log("Customer data saved successfully");
+        return true;
       }
+      return false;
+    } catch (error) {
+      console.error("Failed to save customer data:", error);
+      return false;
     }
-    return null;
-  }, [profileKey]);
+  };
 
   return (
-    <CustomerContext.Provider
-      value={{
-        profile,
-        isProfileLoaded,
-        createProfile,
-        updateProfile,
-        addAddress,
-        removeAddress,
-        addFavoriteItem,
-        removeFavoriteItem,
-        isFavorite,
-        loadProfile,
-      }}
-    >
+    <CustomerContext.Provider value={{ 
+      customerData, 
+      setCustomerData, 
+      clearCustomerData, 
+      saveCustomerData 
+    }}>
       {children}
     </CustomerContext.Provider>
   );
@@ -148,8 +77,6 @@ export function CustomerProvider({ children }: { children: ReactNode }) {
 
 export function useCustomer() {
   const context = useContext(CustomerContext);
-  if (!context) {
-    throw new Error("useCustomer must be used within CustomerProvider");
-  }
+  if (!context) throw new Error("useCustomer must be used within CustomerProvider");
   return context;
 }
